@@ -1,0 +1,54 @@
+.home-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden; /* Ensure content doesn't overflow the container */
+}
+
+.left-panel {
+  flex: 0 0 250px; /* Fixed width for sidebar */
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-right: 1px solid #ccc;
+  overflow-y: auto;
+}
+
+.right-panel {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.footer {
+  padding: 10px;
+  background-color: #f1f1f1;
+  border-top: 1px solid #ccc;
+  text-align: center;
+}
+
+.chat-box {
+  border: 1px solid #ccc;
+  padding: 10px;
+  height: calc(80vh - 180px); /* Adjust height based on other elements */
+  overflow-y: auto;
+}
+
+.message {
+  padding: 5px;
+  border-bottom: 1px solid #eee;
+}
+
+input[type="text"] {
+  width: calc(100% - 70px);
+  padding: 10px;
+  margin-right: 10px;
+}
+
+button {
+  padding: 10px;
+}

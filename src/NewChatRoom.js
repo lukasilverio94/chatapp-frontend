@@ -7,21 +7,30 @@ const NewChatRoom = ({ onRoomCreated }) => {
   useEffect(() => {
     if (ws) {
       ws.onmessage = (message) => {
-        console.log('Received:', message.data);
+        const data = JSON.parse(message.data);
+        console.log('Received:', data);
+
+        if (data.type === 'room_created') {
+          const newRoom = { id: data.room_id, name: roomName };
+          onRoomCreated(newRoom);
+          setRoomName('');
+        }
       };
 
       ws.onclose = () => {
         console.log('WebSocket connection closed');
       };
     }
-  }, [ws]);
+  }, [ws, onRoomCreated, roomName]); // Include onRoomCreated and roomName in the dependency array
 
   const handleCreateRoom = () => {
     if (ws) {
-      ws.send(JSON.stringify({
-        type: 'create_room',
-        room_name: roomName,
-      }));
+      ws.send(
+        JSON.stringify({
+          type: 'create_room',
+          room_name: roomName,
+        }),
+      );
     } else {
       console.error('WebSocket connection is not established');
     }
@@ -29,16 +38,21 @@ const NewChatRoom = ({ onRoomCreated }) => {
 
   useEffect(() => {
     const newWs = new WebSocket('ws://127.0.0.1:8000/ws/chat/');
-    
+
     newWs.onopen = () => {
       console.log('WebSocket connection established');
-      // You can send a message here if you want
-      newWs.send(JSON.stringify({
-        type: 'connection_established',
-      }));
+      newWs.send(
+        JSON.stringify({
+          type: 'connection_established',
+        }),
+      );
     };
-  
+
     setWs(newWs);
+
+    return () => {
+      newWs.close();
+    };
   }, []);
 
   return (

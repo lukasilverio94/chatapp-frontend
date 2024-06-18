@@ -1,28 +1,45 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 
 const NewChatRoom = ({ onRoomCreated }) => {
   const [roomName, setRoomName] = useState('');
+  const [ws, setWs] = useState(null);
 
-  const handleCreateRoom = async () => {
-    try {
-      const response = await axios.post(
-        'http://localhost:8000/chatMeetUp/create-chat-room/',
-        { name: roomName },
-      );
-      if (response.status === 200) {
-        // Assuming server responds with status 201 for successful creation
-        const newRoom = { id: response.data.id, name: roomName };
-        console.log(newRoom);
-        onRoomCreated(newRoom); // Notify parent component with new room details
-        setRoomName('');
-      } else {
-        throw new Error('Failed to create chat room');
-      }
-    } catch (error) {
-      console.error('Error creating chat room:', error);
+  useEffect(() => {
+    if (ws) {
+      ws.onmessage = (message) => {
+        console.log('Received:', message.data);
+      };
+
+      ws.onclose = () => {
+        console.log('WebSocket connection closed');
+      };
+    }
+  }, [ws]);
+
+  const handleCreateRoom = () => {
+    if (ws) {
+      ws.send(JSON.stringify({
+        type: 'create_room',
+        room_name: roomName,
+      }));
+    } else {
+      console.error('WebSocket connection is not established');
     }
   };
+
+  useEffect(() => {
+    const newWs = new WebSocket('ws://127.0.0.1:8000/ws/chat/');
+    
+    newWs.onopen = () => {
+      console.log('WebSocket connection established');
+      // You can send a message here if you want
+      newWs.send(JSON.stringify({
+        type: 'connection_established',
+      }));
+    };
+  
+    setWs(newWs);
+  }, []);
 
   return (
     <div>

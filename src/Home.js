@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import NewChatRoom from './NewChatRoom';
 import ChatRooms from './ChatRooms';
 import ChatBox from './ChatBox'; // Import ChatBox component
-import axios from 'axios';
 import './Home.css'; // Import CSS for styling
 
 const Home = () => {
@@ -36,7 +36,7 @@ const Home = () => {
 
   const handleRoomCreated = (newRoom) => {
     setRooms([...rooms, newRoom]);
-    setSelectedRoom(newRoom);
+    setSelectedRoom(newRoom); // Automatically select the newly created room
   };
 
   const handleSelectRoom = (roomId, roomName) => {

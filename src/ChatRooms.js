@@ -9,7 +9,7 @@ const ChatRooms = ({ rooms, onSelectRoom }) => {
     <div>
       <ul>
         {rooms.map((room) => (
-          <li key={room.id}>
+          <li key={room.id}> {/* Ensure room.id is unique */}
             <button onClick={() => onSelectRoom(room.id, room.name)}>
               {room.name}
             </button>

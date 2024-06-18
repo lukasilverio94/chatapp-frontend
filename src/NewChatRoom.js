@@ -6,10 +6,15 @@ const NewChatRoom = ({ onRoomCreated }) => {
 
   const handleCreateRoom = async () => {
     try {
-      const response = await axios.post('http://localhost:8000/chatMeetUp/create-chat-room/', { name: roomName });
+      const response = await axios.post(
+        'http://localhost:8000/chatMeetUp/create-chat-room/',
+        { name: roomName },
+      );
       if (response.status === 200) {
+        // Assuming server responds with status 201 for successful creation
         const newRoom = { id: response.data.id, name: roomName };
-        onRoomCreated(newRoom);
+        console.log(newRoom);
+        onRoomCreated(newRoom); // Notify parent component with new room details
         setRoomName('');
       } else {
         throw new Error('Failed to create chat room');

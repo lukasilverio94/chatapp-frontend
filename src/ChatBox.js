@@ -4,8 +4,8 @@ import axios from 'axios';
 const ChatBox = ({ roomId, roomName }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [loading, setLoading] = useState(true); // Initialize loading state
-  const [error, setError] = useState(null); // Initialize error state
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const chatSocketRef = useRef(null);
 
   useEffect(() => {
@@ -13,22 +13,18 @@ const ChatBox = ({ roomId, roomName }) => {
       try {
         const response = await axios.get(
           'http://localhost:8000/chatMeetUp/fetch-messages/',
-          {
-            params: {
-              roomId: roomId, // Ensure roomId is defined and passed correctly
-            },
-          },
+          { params: { roomId: roomId } },
         );
         if (response.status === 200) {
-          setMessages(response.data.messages); // Update state with fetched messages
-          setLoading(false); // Turn off loading indicator
+          setMessages(response.data.messages);
+          setLoading(false);
         } else {
           throw new Error(`Failed to fetch messages: ${response.statusText}`);
         }
       } catch (error) {
         console.error('Error fetching messages:', error);
         setError('Failed to fetch messages. Please try again later.');
-        setLoading(false); // Turn off loading indicator in case of error
+        setLoading(false);
       }
     };
 
@@ -36,7 +32,6 @@ const ChatBox = ({ roomId, roomName }) => {
   }, [roomId]);
 
   useEffect(() => {
-    // Establish WebSocket connection
     const chatSocket = new WebSocket(
       'ws://' + window.location.host + '/ws/chat/' + roomId + '/',
     );
@@ -47,7 +42,8 @@ const ChatBox = ({ roomId, roomName }) => {
     };
 
     chatSocket.onclose = (e) => {
-      console.error('Chat socket closed unexpectedly');
+      console.error('Chat socket closed unexpectedly:', e);
+      // Optionally, attempt to reconnect or notify the user
     };
 
     chatSocketRef.current = chatSocket;
@@ -58,34 +54,35 @@ const ChatBox = ({ roomId, roomName }) => {
   }, [roomId]);
 
   const handleSendMessage = async () => {
-    if (chatSocketRef.current) {
-      if (chatSocketRef.current.readyState === WebSocket.OPEN) {
-        chatSocketRef.current.send(JSON.stringify({ message: newMessage }));
-        setNewMessage('');
-      } else {
-        console.error(
-          'WebSocket is not open. Ready state:',
-          chatSocketRef.current.readyState,
-        );
-        setError('WebSocket is not open. Please try again later.');
-      }
+    if (
+      chatSocketRef.current &&
+      chatSocketRef.current.readyState === WebSocket.OPEN
+    ) {
+      chatSocketRef.current.send(JSON.stringify({ message: newMessage }));
+      setNewMessage('');
+    } else {
+      console.error(
+        'WebSocket is not open. Ready state:',
+        chatSocketRef.current?.readyState,
+      );
+      setError('WebSocket is not open. Please try again later.');
     }
   };
 
   if (loading) {
-    return <p>Loading messages...</p>; // Display loading indicator while fetching data
+    return <p>Loading messages...</p>;
   }
 
   if (error) {
-    return <p>Error: {error}</p>; // Display error message if data fetching or sending fails
+    return <p>Error: {error}</p>;
   }
 
   return (
     <div>
       <h2>Chat Room: {roomName}</h2>
       <div className="chat-box">
-        {messages.map((msg, index) => (
-          <div key={index} className="message">
+        {messages.map((msg) => (
+          <div key={msg.id} className="message">
             {msg.text}
           </div>
         ))}

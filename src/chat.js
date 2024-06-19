@@ -1,51 +1,67 @@
-import React, { useEffect, useState } from 'react';
+// Chat.js
 
-const ChatRoom = ({ roomName }) => {
+import React, { useContext, useEffect, useState } from 'react';
+import { WebSocketContext } from './WebSocketManager';
+
+const Chat = ({ receiverId }) => {
+  const socket = useContext(WebSocketContext);
   const [messages, setMessages] = useState([]);
-  const [message, setMessage] = useState('');
-  let chatSocket;
+  const [messageInput, setMessageInput] = useState('');
 
   useEffect(() => {
-    chatSocket = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomName}/`);
+    if (!socket) return;
 
-    chatSocket.onmessage = function (e) {
-      const data = JSON.parse(e.data);
-      setMessages((prevMessages) => [...prevMessages, data.message]);
-    };
+    // Fetch message history on mount
+    socket.send(
+      JSON.stringify({ type: 'fetch_messages', receiver_id: receiverId }),
+    );
 
-    chatSocket.onclose = function (e) {
-      console.error('Chat socket closed unexpectedly');
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.messages) {
+        setMessages(data.messages);
+      }
     };
 
     return () => {
-      chatSocket.close();
+      socket.onmessage = null;
     };
-  }, [roomName]);
+  }, [socket, receiverId]);
 
   const sendMessage = () => {
-    chatSocket.send(
-      JSON.stringify({
-        message: message,
-      }),
-    );
-    setMessage('');
+    if (!socket || !messageInput.trim()) return;
+
+    const messageData = {
+      type: 'send_message',
+      message: messageInput,
+      receiver_id: receiverId,
+    };
+    socket.send(JSON.stringify(messageData));
+    setMessageInput('');
   };
 
   return (
     <div>
-      <div>
-        {messages.map((msg, index) => (
-          <div key={index}>{msg}</div>
+      <div className="message-container">
+        {messages.map((message, index) => (
+          <div key={index} className="message">
+            <p>
+              {message.sender_id}: {message.content}
+            </p>
+          </div>
         ))}
       </div>
-      <input
-        type="text"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-      />
-      <button onClick={sendMessage}>Send</button>
+      <div className="input-container">
+        <input
+          type="text"
+          value={messageInput}
+          onChange={(e) => setMessageInput(e.target.value)}
+          placeholder="Type your message..."
+        />
+        <button onClick={sendMessage}>Send</button>
+      </div>
     </div>
   );
 };
 
-export default ChatRoom;
+export default Chat;

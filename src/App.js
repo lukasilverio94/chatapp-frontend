@@ -1,17 +1,22 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import ChatBox from './ChatBox'; // Correct import path
-import Home from './Home';
-import ChatRooms from './ChatRooms'; // Correct import path
+import WebSocketManager from './WebSocketManager';
+import MessageListCreateComponent from './MessageListCreateComponent';
+import ChatRoomListCreateComponent from './ChatRoomListCreateComponent';
 
-const App = () => (
-  <Router>
-    <Routes>
-      <Route path="/chat/:roomName" element={<ChatBox />} />
-      <Route path="/chatrooms" element={<ChatRooms />} />
-      <Route path="/" element={<Home />} />
-    </Routes>
-  </Router>
-);
+const App = () => {
+  return (
+    <WebSocketManager>
+      <div className="App">
+        <header className="App-header">
+          <h1>Chat Application</h1>
+        </header>
+        <main>
+          <MessageListCreateComponent />
+          <ChatRoomListCreateComponent />
+        </main>
+      </div>
+    </WebSocketManager>
+  );
+};
 
 export default App;

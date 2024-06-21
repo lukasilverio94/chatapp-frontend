@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Container, Button } from 'react-bootstrap';
-import { useSelector, useDispatch } from 'react-redux';
-import { logout } from './auth/authStore';
-import { useNavigate } from 'react-router-dom'; // Update the import statement
-import NewChatRoom from '../NewChatRoom';
-import ChatRooms from '../ChatRooms';
-import ChatBox from '../ChatBox';
-import './Home.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Container, Button } from "react-bootstrap";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "./store/authStore";
+import { useNavigate } from "react-router-dom"; // Update the import statement
+import NewChatRoom from "../NewChatRoom";
+import ChatRooms from "../ChatRooms";
+import ChatBox from "../ChatBox";
+import "./Home.css";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -19,17 +19,19 @@ const Home = () => {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/chatMeetUp/fetch-chat-rooms/');
+        const response = await axios.get(
+          "http://localhost:8000/chatMeetUp/fetch-chat-rooms/"
+        );
         if (response.status === 200) {
           const fetchedRooms = Object.entries(response.data.rooms).map(
             ([id, name]) => ({ id, name })
           );
           setRooms(fetchedRooms);
         } else {
-          throw new Error('Failed to fetch chat rooms');
+          throw new Error("Failed to fetch chat rooms");
         }
       } catch (error) {
-        console.error('Error fetching chat rooms:', error);
+        console.error("Error fetching chat rooms:", error);
       }
     };
 
@@ -47,14 +49,14 @@ const Home = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/login'); // Use navigate instead of history.push
+    navigate("/login"); // Use navigate instead of history.push
   };
 
   if (!isLoggedIn) {
     return (
       <Container>
         <h1>Please log in to access this page</h1>
-        <Button variant="primary" onClick={() => navigate('/login')}>
+        <Button variant="primary" onClick={() => navigate("/login")}>
           Login
         </Button>
       </Container>
@@ -80,7 +82,11 @@ const Home = () => {
       <div className="footer">
         <NewChatRoom onRoomCreated={handleRoomCreated} />
       </div>
-      <Button variant="primary" onClick={handleLogout} className="logout-button">
+      <Button
+        variant="primary"
+        onClick={handleLogout}
+        className="logout-button"
+      >
         Logout
       </Button>
     </div>

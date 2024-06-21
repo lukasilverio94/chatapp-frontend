@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import { Form, Button, Alert, Container } from 'react-bootstrap'; // Added Container here
-import { useDispatch, useSelector } from 'react-redux';
-import { login } from './authStore';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { toast } from 'react-toastify';
+import React, { useState } from "react";
+import { Form, Button, Alert, Container } from "react-bootstrap"; // Added Container here
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../../store/authStore";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isLoggedIn, loading } = useSelector((state) => state.auth);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleEmailChange = (e) => setEmail(e.target.value);
   const handlePasswordChange = (e) => setPassword(e.target.value);
@@ -21,16 +21,16 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-      setError('All fields are required');
+      setError("All fields are required");
       return;
     }
 
-    dispatch({ type: 'auth/loading', payload: true });
+    dispatch({ type: "auth/loading", payload: true });
 
     try {
       const response = await axios.post(
-        'http://localhost:8000/api/auth/login/',
-        { email, password },
+        "http://localhost:8000/api/auth/login/",
+        { email, password }
       );
 
       if (response.status === 200) {
@@ -39,19 +39,19 @@ const LoginPage = () => {
             full_name: response.data.full_name,
             access_token: response.data.access_token,
             refresh_token: response.data.refresh_token,
-          }),
+          })
         );
-        toast.success('Login successful');
-        navigate('/home'); // Redirect to home page after successful login
+        toast.success("Login successful");
+        navigate("/home"); // Redirect to home page after successful login
       }
     } catch (err) {
       if (err.response && err.response.data) {
         setError(err.response.data.detail);
       } else {
-        setError('Server error');
+        setError("Server error");
       }
     } finally {
-      dispatch({ type: 'auth/loading', payload: false });
+      dispatch({ type: "auth/loading", payload: false });
     }
   };
 
@@ -84,7 +84,7 @@ const LoginPage = () => {
         {error && <Alert variant="danger">{error}</Alert>}
 
         <Button variant="primary" type="submit" disabled={loading}>
-          {loading ? 'Loading...' : 'Login'}
+          {loading ? "Loading..." : "Login"}
         </Button>
       </Form>
     </Container>

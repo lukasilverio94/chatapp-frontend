@@ -1,6 +1,6 @@
-import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import SignupForm from './SignupForm'; // Ensure correct path
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import RegisterForm from "../RegisterForm/RegisterForm"; // Ensure correct path
 
 const SignupPage = () => {
   const dispatch = useDispatch();
@@ -9,7 +9,7 @@ const SignupPage = () => {
   return (
     <div>
       <h2>Signup Page</h2>
-      <SignupForm />
+      <RegisterForm />
       {/* Additional content here */}
     </div>
   );

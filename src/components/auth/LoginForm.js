@@ -1,36 +1,51 @@
-// src/components/auth/LoginForm.js
-import React, { useState } from 'react';
-import { Form, Button, Alert } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import { login } from './authStore';
-import { useHistory } from 'react-router-dom';
-import axios from 'axios';
-import { toast } from 'react-toastify';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import { Form, Button, Alert, Container } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../../store/authStore";
+import { useEffect } from "react";
+import "./LoginForm.css";
 
-const LoginForm = () => {
+const LoginPage = () => {
   const dispatch = useDispatch();
-  const history = useHistory();
-  const { loading } = useSelector((state) => state.auth);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const { isLoggedIn, loading } = useSelector((state) => state.auth);
 
-  const handleEmailChange = (e) => setEmail(e.target.value);
-  const handlePasswordChange = (e) => setPassword(e.target.value);
+  // Redirect if already logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/");
+    }
+  }, [isLoggedIn, navigate]);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [error, setError] = useState("");
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-      setError('All fields are required');
+      setError("All fields are required");
       return;
     }
 
-    dispatch({ type: 'auth/loading', payload: true });
+    dispatch({ type: "auth/loading", payload: true });
 
     try {
       const response = await axios.post(
-        'http://localhost:8000/api/auth/login/',
-        { email, password },
+        "http://localhost:8000/api/auth/login/",
+        { email, password }
       );
 
       if (response.status === 200) {
@@ -39,53 +54,96 @@ const LoginForm = () => {
             full_name: response.data.full_name,
             access_token: response.data.access_token,
             refresh_token: response.data.refresh_token,
-          }),
+          })
         );
-        toast.success('Login successful');
-        history.push('/home'); // Redirect to home page after successful login
+        toast.success("Login successful");
+        console.log("User: ", response.data);
+        console.log("USER LOCAL STORAGE", localStorage.getItem("user"));
+        navigate("/");
       }
     } catch (err) {
       if (err.response && err.response.data) {
         setError(err.response.data.detail);
       } else {
-        setError('Server error');
+        setError("Server error");
       }
     } finally {
-      dispatch({ type: 'auth/loading', payload: false });
+      dispatch({ type: "auth/loading", payload: false });
     }
   };
 
   return (
-    <Form onSubmit={handleLogin}>
-      <Form.Group controlId="formBasicEmail">
-        <Form.Label>Email address</Form.Label>
-        <Form.Control
-          type="email"
-          placeholder="Enter email"
-          value={email}
-          onChange={handleEmailChange}
-          required
-        />
-      </Form.Group>
+    <Container className="loginForm-container">
+      <h3 className="loginForm-heading-welcome">Welcome Back !</h3>
+      <Form onSubmit={handleLogin}>
+        <h4 className="loginForm-loginNow">Log in Now:</h4>
+        {error && <Alert variant="danger">{error}</Alert>}
+        <Form.Group controlId="formEmail">
+          <Form.Label className="loginForm-required-label">
+            Email address
+          </Form.Label>
+          <Form.Control
+            className="loginForm-required-control"
+            type="email"
+            value={email}
+            onChange={handleEmailChange}
+            placeholder="Enter email"
+            required
+          />
+          {/* {!email && (
+          <Form.Text className="text-danger">
+            Please enter a valid email
+          </Form.Text>
+        )} */}
+        </Form.Group>
 
-      <Form.Group controlId="formBasicPassword">
-        <Form.Label>Password</Form.Label>
-        <Form.Control
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={handlePasswordChange}
-          required
-        />
-      </Form.Group>
+        <Form.Group controlId="formPassword">
+          <Form.Label
+            id="loginForm-required-password-label"
+            className="loginForm-required-label"
+          >
+            Password
+          </Form.Label>
+          <Form.Control
+            id="loginForm-required-password"
+            className="loginForm-required-control"
+            type="password"
+            value={password}
+            onChange={handlePasswordChange}
+            placeholder="Password"
+            required
+          />
+          {/* {!password && (
+          <Form.Text className="text-danger">Please enter a password</Form.Text>
+        )} */}
 
-      {error && <Alert variant="danger">{error}</Alert>}
+          <Link
+            className="loginForm-forgot-password-link"
+            to="/forgot-password"
+          >
+            Forgot password
+          </Link>
+        </Form.Group>
 
-      <Button variant="primary" type="submit" disabled={loading}>
-        {loading ? 'Loading...' : 'Login'}
-      </Button>
-    </Form>
+        <Button
+          className="loginForm-signin-button"
+          variant="primary"
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? "Loading..." : "Login"}
+        </Button>
+      </Form>
+      <div className="loginForm-dontHaveAccount-container">
+        <p className="loginForm-dontHaveAccount">
+          Don't have an account?
+          <a href="/Signup" className="registerForm-login-link">
+            Sign Up
+          </a>
+        </p>
+      </div>
+    </Container>
   );
 };
 
-export default LoginForm;
+export default LoginPage;

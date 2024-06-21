@@ -52,16 +52,16 @@ const Home = () => {
     navigate("/login"); // Use navigate instead of history.push
   };
 
-  if (!isLoggedIn) {
-    return (
-      <Container>
-        <h1>Please log in to access this page</h1>
-        <Button variant="primary" onClick={() => navigate("/login")}>
-          Login
-        </Button>
-      </Container>
-    );
-  }
+  // if (!isLoggedIn) {
+  //   return (
+  //     <Container>
+  //       <h1>Please log in to access this page</h1>
+  //       <Button variant="primary" onClick={() => navigate("/login")}>
+  //         Login
+  //       </Button>
+  //     </Container>
+  //   );
+  // }
 
   return (
     <div className="home-container">

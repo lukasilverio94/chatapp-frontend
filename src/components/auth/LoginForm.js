@@ -1,12 +1,11 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { useNavigate, Link } from "react-router-dom";
-import { toast } from "react-toastify";
-import { Form, Button, Alert, Container } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
-import { login } from "../../store/authStore";
-import { useEffect } from "react";
-import "./LoginForm.css";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate, Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { Form, Button, Alert, Container } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../../store/authStore';
+import './LoginForm.css'; // Assuming you have your styles in LoginForm.css
 
 const LoginPage = () => {
   const dispatch = useDispatch();
@@ -16,14 +15,13 @@ const LoginPage = () => {
   // Redirect if already logged in
   useEffect(() => {
     if (isLoggedIn) {
-      navigate("/");
+      navigate('/');
     }
   }, [isLoggedIn, navigate]);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -33,19 +31,20 @@ const LoginPage = () => {
     setPassword(e.target.value);
   };
 
+  // LoginPage component
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-      setError("All fields are required");
+      setError('All fields are required');
       return;
     }
 
-    dispatch({ type: "auth/loading", payload: true });
+    dispatch({ type: 'auth/loading', payload: true });
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/auth/login/",
-        { email, password }
+        'http://localhost:8000/api/auth/login/',
+        { email, password },
       );
 
       if (response.status === 200) {
@@ -54,27 +53,25 @@ const LoginPage = () => {
             full_name: response.data.full_name,
             access_token: response.data.access_token,
             refresh_token: response.data.refresh_token,
-          })
+          }),
         );
-        toast.success("Login successful");
-        console.log("User: ", response.data);
-        console.log("USER LOCAL STORAGE", localStorage.getItem("user"));
-        navigate("/");
+        toast.success('Login successful');
+        navigate('/');
       }
     } catch (err) {
       if (err.response && err.response.data) {
         setError(err.response.data.detail);
       } else {
-        setError("Server error");
+        setError('Server error');
       }
     } finally {
-      dispatch({ type: "auth/loading", payload: false });
+      dispatch({ type: 'auth/loading', payload: false });
     }
   };
 
   return (
     <Container className="loginForm-container">
-      <h3 className="loginForm-heading-welcome">Welcome Back !</h3>
+      <h3 className="loginForm-heading-welcome">Welcome Back!</h3>
       <Form onSubmit={handleLogin}>
         <h4 className="loginForm-loginNow">Log in Now:</h4>
         {error && <Alert variant="danger">{error}</Alert>}
@@ -90,22 +87,16 @@ const LoginPage = () => {
             placeholder="Enter email"
             required
           />
-          {/* {!email && (
-          <Form.Text className="text-danger">
-            Please enter a valid email
-          </Form.Text>
-        )} */}
+          {!email && (
+            <Form.Text className="text-danger">
+              Please enter a valid email
+            </Form.Text>
+          )}
         </Form.Group>
 
         <Form.Group controlId="formPassword">
-          <Form.Label
-            id="loginForm-required-password-label"
-            className="loginForm-required-label"
-          >
-            Password
-          </Form.Label>
+          <Form.Label className="loginForm-required-label">Password</Form.Label>
           <Form.Control
-            id="loginForm-required-password"
             className="loginForm-required-control"
             type="password"
             value={password}
@@ -113,9 +104,11 @@ const LoginPage = () => {
             placeholder="Password"
             required
           />
-          {/* {!password && (
-          <Form.Text className="text-danger">Please enter a password</Form.Text>
-        )} */}
+          {!password && (
+            <Form.Text className="text-danger">
+              Please enter a password
+            </Form.Text>
+          )}
 
           <Link
             className="loginForm-forgot-password-link"
@@ -131,15 +124,15 @@ const LoginPage = () => {
           type="submit"
           disabled={loading}
         >
-          {loading ? "Loading..." : "Login"}
+          {loading ? 'Loading...' : 'Login'}
         </Button>
       </Form>
       <div className="loginForm-dontHaveAccount-container">
         <p className="loginForm-dontHaveAccount">
           Don't have an account?
-          <a href="/Signup" className="registerForm-login-link">
+          <Link to="/Signup" className="registerForm-login-link">
             Sign Up
-          </a>
+          </Link>
         </p>
       </div>
     </Container>

@@ -1,6 +1,5 @@
 // src/store/authStore.js
 import { createSlice } from '@reduxjs/toolkit';
-import { useHistory } from 'react-router-dom';
 
 const initialState = {
   isLoggedIn: false,
@@ -14,7 +13,7 @@ const authSlice = createSlice({
   reducers: {
     login(state, action) {
       state.isLoggedIn = true;
-      state.user = action.payload;
+      state.user = action.payload; // Assuming action.payload is an object with user details
     },
     logout(state) {
       state.isLoggedIn = false;

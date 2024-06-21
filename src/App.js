@@ -16,9 +16,10 @@ function App() {
       <Router>
         <div className="App">
           <Routes>
-            <Route path="/" element={<Register />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
-            <Route path="/login" element={<LoginPage />} />{' '}
+            
             <Route path="/home" element={<Home />} />
             {/* Adding a login route */}
           </Routes>

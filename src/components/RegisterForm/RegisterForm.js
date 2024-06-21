@@ -1,61 +1,52 @@
-import React, { useState } from "react";
-import { Form, Button, Container, Row, Col } from "react-bootstrap";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import React, { useState } from 'react';
+import { Form, Button, Container, Row, Col } from 'react-bootstrap';
+import axios from 'axios';
+import { useNavigate, Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const RegisterForm = () => {
-  // used to navigate between components
   const navigate = useNavigate();
-  // set the state
+
   const [formData, setFormData] = useState({
-    first_name: "",
-    last_name: "",
-    email: "",
-    password: "",
-    password2: "",
+    first_name: '',
+    last_name: '',
+    email: '',
+    password: '',
+    password2: '',
   });
 
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
+    setFormData({
+      ...formData,
       [e.target.name]: e.target.value,
-    }));
-    setError(""); // Clear error when input changes
+    });
+    setError(''); // Clear error when input changes
   };
 
   const { first_name, last_name, email, password, password2 } = formData;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
+
     if (!first_name || !last_name || !email || !password || !password2) {
-      //throw an error
-      setError("All fields are required");
+      setError('All fields are required');
     } else if (password !== password2) {
       setError("Passwords don't match. Try again!");
     } else {
-      // make call to api
       try {
-        console.log(formData);
         const res = await axios.post(
-          "http://localhost:8000/api/auth/register/",
-          formData
+          'http://localhost:8000/api/auth/register/',
+          formData,
         );
-        //check our response
-        const response = res.data;
-        // user created successfully
+
         if (res.status === 201) {
-          //redirect to verifyemail
-          navigate("/verify-email");
-          toast.success(response.message);
+          navigate('/verify-email');
+          toast.success('Registration successful. Please verify your email.');
         }
       } catch (err) {
         if (err.response && err.response.data) {
-          // Django validation error messages will be in err.response.data
-          // You might need to adjust this depending on the exact structure of your error messages
           if (err.response.data.email) {
             setError(err.response.data.email[0]);
           } else if (err.response.data.password) {
@@ -64,27 +55,19 @@ const RegisterForm = () => {
             setError(err.response.data.password2[0]);
           }
         } else {
-          setError("Server Error. Please try again later.");
+          setError('Server Error. Please try again later.');
         }
-
-        //   //server error pass to error
-        //  // setError("Server Error. Please try again later.");
-        //   console.log(Object.values(err.response.request.responseText));
-
-        //  console.log(err.response.request.responseText);
-        //  //setError(err.response.request.responseText);
-        // }
       }
     }
   };
 
   return (
     <Container className="registerForm-container">
-      <Row className="justify-content-md-end">
-        <Col xs={25} md={30}>
+      <Row className="justify-content-md-center">
+        <Col xs={12} md={8}>
           <div className="registerForm-create-account">
             <h4>Create your account now:</h4>
-            <p style={{ color: "red" }}>{error ? error : ""}</p>
+            <p style={{ color: 'red' }}>{error}</p>
           </div>
           <Form onSubmit={handleSubmit}>
             <Form.Group controlId="formFirstName">
@@ -98,7 +81,7 @@ const RegisterForm = () => {
                 name="first_name"
                 value={first_name}
                 onChange={handleChange}
-                required // Add required attribute
+                required
               />
             </Form.Group>
 
@@ -109,18 +92,16 @@ const RegisterForm = () => {
               <Form.Control
                 className="registerForm-required-control"
                 type="text"
-                placeholder="Enter your first name"
+                placeholder="Enter your last name"
                 name="last_name"
                 value={last_name}
                 onChange={handleChange}
+                required
               />
             </Form.Group>
 
             <Form.Group controlId="formEmail">
-              <Form.Label
-                className="registerForm-required-label"
-                id="registerForm-email"
-              >
+              <Form.Label className="registerForm-required-label">
                 Email address:
               </Form.Label>
               <Form.Control
@@ -130,6 +111,7 @@ const RegisterForm = () => {
                 name="email"
                 value={email}
                 onChange={handleChange}
+                required
               />
             </Form.Group>
 
@@ -144,14 +126,12 @@ const RegisterForm = () => {
                 name="password"
                 value={password}
                 onChange={handleChange}
+                required
               />
             </Form.Group>
 
             <Form.Group controlId="formRepeatPassword">
-              <Form.Label
-                className="registerForm-required-label"
-                id="registerForm-repeatpassword"
-              >
+              <Form.Label className="registerForm-required-label">
                 Repeat Password:
               </Form.Label>
               <Form.Control
@@ -161,12 +141,17 @@ const RegisterForm = () => {
                 name="password2"
                 value={password2}
                 onChange={handleChange}
+                required
               />
             </Form.Group>
 
-            <a href="/terms" className="registerForm-terms-link">
-              By signing up you agree to the terms and conditions.
-            </a>
+            <Form.Text className="text-muted">
+              By signing up you agree to the{' '}
+              <Link to="/terms" className="registerForm-terms-link">
+                terms and conditions
+              </Link>
+              .
+            </Form.Text>
 
             <Button
               className="registerForm-signup-button"
@@ -178,14 +163,14 @@ const RegisterForm = () => {
 
             <div className="registerForm-haveAccount-container">
               <p className="registerForm-haveAccount">
-                Already have an account ?
-                <a href="/login" className="registerForm-login-link">
+                Already have an account?{' '}
+                <Link to="/login" className="registerForm-login-link">
                   Login
-                </a>
+                </Link>
               </p>
             </div>
           </Form>
-          <h3>Or </h3>
+          <h3>Or</h3>
           <div className="registerForm-GoogleContainer">
             <Button
               className="registerForm-signup-google-button"

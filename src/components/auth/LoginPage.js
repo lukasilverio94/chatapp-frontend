@@ -1,30 +1,26 @@
-// src/components/auth/SignupPage.js
-
 import React, { useState } from 'react';
-import { Form, Button, Alert } from 'react-bootstrap';
+import { Form, Button, Alert, Container } from 'react-bootstrap'; // Added Container here
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate instead of useHistory
+import { login } from './authStore';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { login } from './authStore';
 
-const SignupPage = () => {
+const LoginPage = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // useNavigate replaces useHistory in React Router v6
-  const { loading } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const { isLoggedIn, loading } = useSelector((state) => state.auth);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
   const [error, setError] = useState('');
 
   const handleEmailChange = (e) => setEmail(e.target.value);
   const handlePasswordChange = (e) => setPassword(e.target.value);
-  const handleFullNameChange = (e) => setFullName(e.target.value);
 
-  const handleSignup = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (!email || !password || !fullName) {
+    if (!email || !password) {
       setError('All fields are required');
       return;
     }
@@ -33,21 +29,20 @@ const SignupPage = () => {
 
     try {
       const response = await axios.post(
-        'http://localhost:8000/api/auth/signup/',
-        { email, password, full_name: fullName },
+        'http://localhost:8000/api/auth/login/',
+        { email, password },
       );
 
-      if (response.status === 201) {
-        // Assuming signup API returns 201 Created
+      if (response.status === 200) {
         dispatch(
           login({
-            full_name: fullName,
+            full_name: response.data.full_name,
             access_token: response.data.access_token,
             refresh_token: response.data.refresh_token,
           }),
         );
-        toast.success('Signup successful. You are now logged in.');
-        navigate('/home'); // Use navigate instead of history.push
+        toast.success('Login successful');
+        navigate('/home'); // Redirect to home page after successful login
       }
     } catch (err) {
       if (err.response && err.response.data) {
@@ -61,20 +56,9 @@ const SignupPage = () => {
   };
 
   return (
-    <div className="SignupPage">
-      <h3>Signup</h3>
-      <Form onSubmit={handleSignup}>
-        <Form.Group controlId="formBasicFullName">
-          <Form.Label>Full Name</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter your full name"
-            value={fullName}
-            onChange={handleFullNameChange}
-            required
-          />
-        </Form.Group>
-
+    <Container>
+      <h3>Login</h3>
+      <Form onSubmit={handleLogin}>
         <Form.Group controlId="formBasicEmail">
           <Form.Label>Email address</Form.Label>
           <Form.Control
@@ -100,11 +84,11 @@ const SignupPage = () => {
         {error && <Alert variant="danger">{error}</Alert>}
 
         <Button variant="primary" type="submit" disabled={loading}>
-          {loading ? 'Loading...' : 'Signup'}
+          {loading ? 'Loading...' : 'Login'}
         </Button>
       </Form>
-    </div>
+    </Container>
   );
 };
 
-export default SignupPage;
+export default LoginPage;

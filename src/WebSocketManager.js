@@ -6,7 +6,9 @@ const WebSocketManager = ({ children }) => {
   const [socket, setSocket] = useState({ chatSocket: null, notificationSocket: null });
 
   useEffect(() => {
-    const chatSocket = new WebSocket('ws://localhost:8000/ws/chat/some_receiver_id/'); // Adjust WebSocket URL as necessary
+    const chatSocket = new WebSocket(
+      'ws://localhost:8000/ws/chat/receiver_id/',
+    ); // Adjust WebSocket URL as necessary
 
     chatSocket.onopen = () => {
       console.log('WebSocket connection opened for chat');

@@ -8,7 +8,9 @@ const ChatRoomListCreateComponent = () => {
   useEffect(() => {
     const fetchChatRooms = async () => {
       try {
-        const response = await axios.get('/api/chatrooms/'); // Adjust URL as per your setup
+        const response = await axios.get(
+          'http://localhost:8000/chatMeetUp/chatrooms/',
+        ); // Adjust URL as per your setup
         setChatRooms(response.data);
       } catch (error) {
         setError(error.message); // Log or handle the error appropriately

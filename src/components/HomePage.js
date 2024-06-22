@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Container, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../store/authStore';
 import { useNavigate } from 'react-router-dom';
 import NewChatRoom from '../NewChatRoom';
-import ChatRooms from '../ChatRooms';
-import ChatBox from '../ChatBox';
-import ChatRoomListCreateComponent from "../ChatRoomListCreateComponent";
+import ChatRoomListCreateComponent from './ChatRoomListCreateComponent';
+import ChatRoom from '../ChatRoom'; // Import ChatRoom component
 import styles from './Home.module.css'; // Ensure the path is correct
+import axios from 'axios';
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -16,7 +15,6 @@ const Home = () => {
   const { isLoggedIn, user } = useSelector((state) => state.auth);
   const [rooms, setRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
-  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -34,7 +32,6 @@ const Home = () => {
         }
       } catch (error) {
         console.error('Error fetching chat rooms:', error);
-        setError('Failed to fetch chat rooms');
       }
     };
 
@@ -71,12 +68,13 @@ const Home = () => {
       <div className={styles.mainContent}>
         <div className={styles.leftPanel}>
           <h1>Welcome, {user.full_name}!</h1>
-          <h2>Chat Rooms</h2>
-          <ChatRoomListCreateComponent />
+          {/* <h2>Chat Rooms</h2> */}
+          <ChatRoomListCreateComponent
+                      />
         </div>
         <div className={styles.rightPanel}>
           {selectedRoom ? (
-            <ChatBox roomId={selectedRoom.id} roomName={selectedRoom.name} />
+            <ChatRoom roomId={selectedRoom.id} roomName={selectedRoom.name} />
           ) : (
             <h2>Select a chat room to start chatting</h2>
           )}
@@ -85,8 +83,6 @@ const Home = () => {
       <div className={styles.footer}>
         <NewChatRoom onRoomCreated={handleRoomCreated} />
       </div>
-    
-      ChatRoomListCreateComponent
       <Button
         variant="primary"
         onClick={handleLogout}

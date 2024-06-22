@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const ChatRoomListCreateComponent = () => {
@@ -8,12 +9,10 @@ const ChatRoomListCreateComponent = () => {
   useEffect(() => {
     const fetchChatRooms = async () => {
       try {
-        const response = await axios.get(
-          'http://localhost:8000/chatMeetUp/chatrooms/',
-        ); // Adjust URL as per your setup
+        const response = await axios.get('http://localhost:8000/chatMeetUp/chatrooms/');
         setChatRooms(response.data);
       } catch (error) {
-        setError(error.message); // Log or handle the error appropriately
+        setError(error.message);
       }
     };
 
@@ -30,7 +29,10 @@ const ChatRoomListCreateComponent = () => {
       <ul>
         {chatRooms.map((room) => (
           <li key={room.id}>
-            <strong>{room.name}</strong> - {room.description}
+            <p>{room.id}</p>
+            <Link to={`/chatroom/${room.id}`}>
+              <strong>{room.name}</strong> - {room.description}
+            </Link>
           </li>
         ))}
       </ul>

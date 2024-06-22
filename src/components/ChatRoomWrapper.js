@@ -10,7 +10,7 @@ const ChatRoomWrapper = ({ roomId }) => {
     const fetchRoomName = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/chatrooms/${roomId}/`,
+          `http://localhost:8000/chatrooms/${roomId}/`
         );
         setRoomName(response.data.name); // Assuming the response contains the room name
       } catch (error) {
@@ -18,37 +18,32 @@ const ChatRoomWrapper = ({ roomId }) => {
       }
     };
 
-    const initWebSocket = () => {
-      // Connect to WebSocket
-      socketRef.current = new WebSocket(
-        `ws://localhost:8000/ws/chatroom/${roomId}/`,
-      );
+    fetchRoomName();
 
-      socketRef.current.onopen = () => {
-        console.log('WebSocket connected');
-      };
+    // Connect to WebSocket
+    socketRef.current = new WebSocket(
+      `ws://localhost:8000/ws/chatroom/${roomId}/`
+    );
 
-      socketRef.current.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        console.log('Message received:', message);
-        // Update messages state with received message
-        setMessages((prevMessages) => [...prevMessages, message]);
-      };
-
-      socketRef.current.onerror = (error) => {
-        console.error('WebSocket error:', error);
-      };
-
-      socketRef.current.onclose = () => {
-        console.log('WebSocket disconnected');
-      };
+    socketRef.current.onopen = () => {
+      console.log('WebSocket connected');
     };
 
-    fetchRoomName();
-    initWebSocket();
+    socketRef.current.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      setMessages((prevMessages) => [...prevMessages, message]);
+    };
 
-    // Cleanup: close WebSocket connection
+    socketRef.current.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    socketRef.current.onclose = () => {
+      console.log('WebSocket disconnected');
+    };
+
     return () => {
+      // Cleanup: close WebSocket connection
       if (socketRef.current) {
         socketRef.current.close();
       }
@@ -56,11 +51,7 @@ const ChatRoomWrapper = ({ roomId }) => {
   }, [roomId]);
 
   const sendMessage = (message) => {
-    if (socketRef.current.readyState === WebSocket.OPEN) {
-      socketRef.current.send(JSON.stringify({ message }));
-    } else {
-      console.error('WebSocket is not open to send messages');
-    }
+    socketRef.current.send(JSON.stringify({ message }));
   };
 
   return (

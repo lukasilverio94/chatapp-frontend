@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
 
 const ChatRoomWrapper = ({ roomId }) => {
-  const [roomName, setRoomName] = useState('');
+  const [roomName, setRoomName] = useState("");
   const [messages, setMessages] = useState([]);
   const socketRef = useRef(null);
 
@@ -14,7 +14,7 @@ const ChatRoomWrapper = ({ roomId }) => {
         );
         setRoomName(response.data.name); // Assuming the response contains the room name
       } catch (error) {
-        console.error('Error fetching room name:', error);
+        console.error("Error fetching room name:", error);
       }
     };
 
@@ -26,7 +26,7 @@ const ChatRoomWrapper = ({ roomId }) => {
     );
 
     socketRef.current.onopen = () => {
-      console.log('WebSocket connected');
+      console.log("WebSocket connected");
     };
 
     socketRef.current.onmessage = (event) => {
@@ -35,11 +35,11 @@ const ChatRoomWrapper = ({ roomId }) => {
     };
 
     socketRef.current.onerror = (error) => {
-      console.error('WebSocket error:', error);
+      console.error("WebSocket error:", error);
     };
 
     socketRef.current.onclose = () => {
-      console.log('WebSocket disconnected');
+      console.log("WebSocket disconnected");
     };
 
     return () => {
@@ -68,9 +68,9 @@ const ChatRoomWrapper = ({ roomId }) => {
         type="text"
         placeholder="Type your message..."
         onKeyDown={(e) => {
-          if (e.key === 'Enter') {
+          if (e.key === "Enter") {
             sendMessage(e.target.value);
-            e.target.value = '';
+            e.target.value = "";
           }
         }}
       />

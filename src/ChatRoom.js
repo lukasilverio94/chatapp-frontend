@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
 
 const ChatRoom = ({ roomId }) => {
-  const [messageInput, setMessageInput] = useState('');
+  const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [error, setError] = useState(null);
   const socketRef = useRef(null);
@@ -11,7 +11,7 @@ const ChatRoom = ({ roomId }) => {
     const fetchMessages = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/messages/?room=${roomId}`,
+          `http://localhost:8000/messages/?room=${roomId}`
         );
         setMessages(response.data);
       } catch (error) {
@@ -23,11 +23,11 @@ const ChatRoom = ({ roomId }) => {
 
     // Initialize WebSocket connection
     socketRef.current = new WebSocket(
-      `ws://localhost:8000/ws/chatroom/${roomId}/`,
+      `ws://localhost:8000/ws/chatroom/${roomId}/`
     );
 
     socketRef.current.onopen = () => {
-      console.log('WebSocket connected');
+      console.log("WebSocket connected");
     };
 
     socketRef.current.onmessage = (event) => {
@@ -36,11 +36,11 @@ const ChatRoom = ({ roomId }) => {
     };
 
     socketRef.current.onerror = (error) => {
-      console.error('WebSocket error:', error);
+      console.error("WebSocket error:", error);
     };
 
     socketRef.current.onclose = () => {
-      console.log('WebSocket disconnected');
+      console.log("WebSocket disconnected");
     };
 
     return () => {
@@ -53,11 +53,11 @@ const ChatRoom = ({ roomId }) => {
 
   const handleSendMessage = async () => {
     try {
-      await axios.post('http://localhost:8000/messages/', {
+      await axios.post("http://localhost:8000/messages/", {
         room: roomId,
         message: messageInput,
       });
-      setMessageInput('');
+      setMessageInput("");
     } catch (error) {
       setError(error.message);
     }

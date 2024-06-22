@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { Form, Button, Alert, Container } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../../store/authStore';
-import './LoginForm.css'; // Assuming you have your styles in LoginForm.css
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import { Form, Button, Alert, Container } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../../store/authStore";
+import "./LoginForm.css"; // Assuming you have your styles in LoginForm.css
 
 const LoginPage = () => {
   const dispatch = useDispatch();
@@ -15,13 +15,13 @@ const LoginPage = () => {
   // Redirect if already logged in
   useEffect(() => {
     if (isLoggedIn) {
-      navigate('/');
+      navigate("/");
     }
   }, [isLoggedIn, navigate]);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -35,37 +35,40 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-      setError('All fields are required');
+      setError("All fields are required");
       return;
     }
 
-    dispatch({ type: 'auth/loading', payload: true });
+    dispatch({ type: "auth/loading", payload: true });
 
     try {
       const response = await axios.post(
-        'http://localhost:8000/api/auth/login/',
-        { email, password },
+        "http://localhost:8000/api/auth/login/",
+        { email, password }
       );
 
       if (response.status === 200) {
+        // Store access_token in localStorage
+        localStorage.setItem("access_token", response.data.access_token);
+        console.log("DATA RESPONSE", response.data);
         dispatch(
           login({
             full_name: response.data.full_name,
             access_token: response.data.access_token,
             refresh_token: response.data.refresh_token,
-          }),
+          })
         );
-        toast.success('Login successful');
-        navigate('/');
+        toast.success("Login successful");
+        navigate("/");
       }
     } catch (err) {
       if (err.response && err.response.data) {
         setError(err.response.data.detail);
       } else {
-        setError('Server error');
+        setError("Server error");
       }
     } finally {
-      dispatch({ type: 'auth/loading', payload: false });
+      dispatch({ type: "auth/loading", payload: false });
     }
   };
 
@@ -124,7 +127,7 @@ const LoginPage = () => {
           type="submit"
           disabled={loading}
         >
-          {loading ? 'Loading...' : 'Login'}
+          {loading ? "Loading..." : "Login"}
         </Button>
       </Form>
       <div className="loginForm-dontHaveAccount-container">

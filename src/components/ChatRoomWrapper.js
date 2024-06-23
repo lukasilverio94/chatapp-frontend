@@ -20,7 +20,6 @@ const ChatRoomWrapper = () => {
       if (!token) {
         console.error('JWT Token is missing');
         setError('JWT Token is missing');
-        // Handle missing token scenario
         return;
       }
 

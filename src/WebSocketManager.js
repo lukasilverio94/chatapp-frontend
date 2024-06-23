@@ -8,20 +8,33 @@ const ChatRoomWrapper = ({ roomId }) => {
 
   useEffect(() => {
     const fetchRoomName = async () => {
+      if (!roomId) return;
+
       try {
         const response = await axios.get(
           `http://localhost:8000/chatrooms/${roomId}/`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+            },
+          },
         );
-        setRoomName(response.data.name); // Assuming the response contains the room name
+        setRoomName(response.data.name);
       } catch (error) {
-        console.error('Error fetching room name:', error);
+        if (error.response && error.response.status === 404) {
+          console.error('Room not found:', error);
+        } else {
+          console.error('Error fetching room name:', error);
+        }
       }
     };
 
     const initWebSocket = () => {
-      // Connect to WebSocket
+      if (!roomId) return;
+
+      const token = localStorage.getItem('access_token');
       socketRef.current = new WebSocket(
-        `ws://localhost:8000/ws/chatroom/${roomId}/`,
+        `ws://localhost:8000/ws/chatroom/${roomId}/?token=${token}`,
       );
 
       socketRef.current.onopen = () => {
@@ -31,7 +44,6 @@ const ChatRoomWrapper = ({ roomId }) => {
       socketRef.current.onmessage = (event) => {
         const message = JSON.parse(event.data);
         console.log('Message received:', message);
-        // Update messages state with received message
         setMessages((prevMessages) => [...prevMessages, message]);
       };
 
@@ -47,7 +59,6 @@ const ChatRoomWrapper = ({ roomId }) => {
     fetchRoomName();
     initWebSocket();
 
-    // Cleanup: close WebSocket connection
     return () => {
       if (socketRef.current) {
         socketRef.current.close();
@@ -57,7 +68,11 @@ const ChatRoomWrapper = ({ roomId }) => {
 
   const sendMessage = (message) => {
     if (socketRef.current.readyState === WebSocket.OPEN) {
-      socketRef.current.send(JSON.stringify({ message }));
+      const user = JSON.parse(localStorage.getItem('user')); // Fetch user info as needed
+      const username = user ? user.username : 'Anonymous';
+      const messageData = { message, username };
+
+      socketRef.current.send(JSON.stringify(messageData));
     } else {
       console.error('WebSocket is not open to send messages');
     }

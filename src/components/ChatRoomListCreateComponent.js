@@ -9,7 +9,9 @@ const ChatRoomListCreateComponent = () => {
   useEffect(() => {
     const fetchChatRooms = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/chatMeetUp/chatrooms/');
+        const response = await axios.get(
+          'http://localhost:8000/chatMeetUp/chatrooms/',
+        );
         setChatRooms(response.data);
       } catch (error) {
         setError(error.message);

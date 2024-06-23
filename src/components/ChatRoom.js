@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const ChatRoom = ({ roomId, messages, onSendMessage }) => {
+const ChatRoom = ({ roomId, messages, onSendMessage, onReceiveMessage }) => {
   const [messageInput, setMessageInput] = useState('');
   const [error, setError] = useState(null);
 
@@ -22,13 +22,25 @@ const ChatRoom = ({ roomId, messages, onSendMessage }) => {
     setMessageInput(e.target.value);
   };
 
+  // Example of handling incoming messages
+  const handleReceiveMessage = (message) => {
+    try {
+      onReceiveMessage(message);
+      setError(null); // Clear any previous errors on successful reception
+    } catch (error) {
+      console.error('Error processing received message:', error);
+      setError('Error processing received message. Please try again.');
+    }
+  };
+
   return (
     <div>
       <h2>Messages for Room {roomId}</h2>
       <ul>
         {messages.map((msg, index) => (
           <li key={index}>
-            <strong>{msg.user}</strong>: {msg.message}
+            {/* Display each message */}
+            <strong>{index}</strong>: {msg}
           </li>
         ))}
       </ul>
@@ -41,7 +53,7 @@ const ChatRoom = ({ roomId, messages, onSendMessage }) => {
         />
         <button type="submit">Send</button>
       </form>
-      {error && <div>Error: {error}</div>}
+      {error && <div className="error">{error}</div>}
     </div>
   );
 };

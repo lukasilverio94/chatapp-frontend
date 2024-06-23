@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import ChatRoom from './ChatRoom';
+import axios from 'axios';
 
 const ChatRoomWrapper = () => {
   const { roomId } = useParams(); // Extract roomId from URL parameters
   const [messages, setMessages] = useState([]);
   const [error, setError] = useState(null);
   const socketRef = useRef(null);
+  const [messageInput, setMessageInput] = useState('');
 
   useEffect(() => {
     const initWebSocket = async () => {
@@ -23,6 +25,20 @@ const ChatRoomWrapper = () => {
         return;
       }
 
+      // Fetch initial messages
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/api/chatroom/${roomId}/messages`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+        setMessages(response.data.messages); // Assuming response.data.messages is an array
+      } catch (fetchError) {
+        console.error('Error fetching initial messages:', fetchError);
+        setError('Error fetching initial messages. Please try again.');
+      }
+
       const wsUrl = `ws://localhost:8000/ws/chatroom/${roomId}/?token=${token}`;
 
       try {
@@ -34,9 +50,17 @@ const ChatRoomWrapper = () => {
         };
 
         socketRef.current.onmessage = (event) => {
-          const message = JSON.parse(event.data);
-          console.log('Message received:', message);
-          setMessages((prevMessages) => [...prevMessages, message]);
+          try {
+            const data = JSON.parse(event.data);
+            if (data.messages) {
+              console.log('Messages received:', data.messages);
+              setMessages([...messages, ...data.messages]); // Update messages array
+            }
+            setError(null); // Clear any previous errors on successful reception
+          } catch (error) {
+            console.error('Error processing received message:', error);
+            setError('Error processing received message. Please try again.');
+          }
         };
 
         socketRef.current.onerror = (error) => {
@@ -56,7 +80,7 @@ const ChatRoomWrapper = () => {
 
     initWebSocket();
 
-    // Cleanup: close WebSocket connection
+    // Cleanup: close WebSocket connection when the component unmounts
     return () => {
       if (socketRef.current) {
         socketRef.current.close();
@@ -71,14 +95,21 @@ const ChatRoomWrapper = () => {
       return;
     }
 
-    // Check if WebSocket connection is open
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
       try {
-        socketRef.current.send(
-          JSON.stringify({
-            message,
-          }),
-        );
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+          console.error('JWT Token is missing');
+          setError('JWT Token is missing');
+          return;
+        }
+
+        const messagePayload = {
+          message,
+          token,
+        };
+
+        socketRef.current.send(JSON.stringify(messagePayload));
         setError(null); // Clear any previous errors on successful send
       } catch (error) {
         console.error('Error sending message:', error);
@@ -90,9 +121,19 @@ const ChatRoomWrapper = () => {
     }
   };
 
+  const handleInputChange = (e) => {
+    setMessageInput(e.target.value);
+  };
+
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+    sendMessage(messageInput);
+    setMessageInput(''); // Clear message input after sending
+  };
+
   return (
     <div>
-      {messages.length === 0 && (
+      {messages.length === 0 && !error && (
         <p>No messages available. Please check your connection.</p>
       )}
       <ChatRoom
@@ -100,6 +141,7 @@ const ChatRoomWrapper = () => {
         messages={messages}
         onSendMessage={sendMessage}
       />
+      
       {error && <div className="error">{error}</div>}
     </div>
   );

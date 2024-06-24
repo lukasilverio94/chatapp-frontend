@@ -4,11 +4,10 @@ import ChatRoom from './ChatRoom';
 import axios from 'axios';
 
 const ChatRoomWrapper = () => {
-  const { roomId } = useParams(); // Extract roomId from URL parameters
+  const { roomId } = useParams();
   const [messages, setMessages] = useState([]);
   const [error, setError] = useState(null);
   const socketRef = useRef(null);
-  const [messageInput, setMessageInput] = useState('');
 
   useEffect(() => {
     const initWebSocket = async () => {
@@ -42,6 +41,10 @@ const ChatRoomWrapper = () => {
       const wsUrl = `ws://localhost:8000/ws/chatroom/${roomId}/?token=${token}`;
 
       try {
+        if (socketRef.current) {
+          socketRef.current.close();
+        }
+
         socketRef.current = new WebSocket(wsUrl);
 
         socketRef.current.onopen = () => {
@@ -52,9 +55,10 @@ const ChatRoomWrapper = () => {
         socketRef.current.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
-            if (data.messages) {
-              console.log('Messages received:', data.messages);
-              setMessages([...messages, ...data.messages]); // Update messages array
+            if (data.message) {
+              setMessages((prevMessages) => [...prevMessages, data.message]);
+            } else if (data.messages) {
+              setMessages(data.messages);
             }
             setError(null); // Clear any previous errors on successful reception
           } catch (error) {
@@ -121,16 +125,6 @@ const ChatRoomWrapper = () => {
     }
   };
 
-  const handleInputChange = (e) => {
-    setMessageInput(e.target.value);
-  };
-
-  const handleSendMessage = (e) => {
-    e.preventDefault();
-    sendMessage(messageInput);
-    setMessageInput(''); // Clear message input after sending
-  };
-
   return (
     <div>
       {messages.length === 0 && !error && (
@@ -141,7 +135,6 @@ const ChatRoomWrapper = () => {
         messages={messages}
         onSendMessage={sendMessage}
       />
-      
       {error && <div className="error">{error}</div>}
     </div>
   );

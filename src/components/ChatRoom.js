@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const ChatRoom = ({ roomId, messages, onSendMessage, onReceiveMessage }) => {
+const ChatRoom = ({ roomId, messages, onSendMessage }) => {
   const [messageInput, setMessageInput] = useState('');
   const [error, setError] = useState(null);
 
@@ -20,17 +20,6 @@ const ChatRoom = ({ roomId, messages, onSendMessage, onReceiveMessage }) => {
 
   const handleInputChange = (e) => {
     setMessageInput(e.target.value);
-  };
-
-  // Example of handling incoming messages
-  const handleReceiveMessage = (message) => {
-    try {
-      onReceiveMessage(message);
-      setError(null); // Clear any previous errors on successful reception
-    } catch (error) {
-      console.error('Error processing received message:', error);
-      setError('Error processing received message. Please try again.');
-    }
   };
 
   return (

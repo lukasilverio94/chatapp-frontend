@@ -137,7 +137,7 @@ const LoginPage = () => {
       <div className="loginForm-dontHaveAccount-container">
         <p className="loginForm-dontHaveAccount">
           Don't have an account?
-          <Link to="/Signup" className="registerForm-login-link">
+          <Link to="/register" className="registerForm-login-link">
             Sign Up
           </Link>
         </p>

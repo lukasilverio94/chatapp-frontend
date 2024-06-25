@@ -57,6 +57,7 @@ const ChatRoomWrapper = () => {
             const data = JSON.parse(event.data);
             if (data.message) {
               setMessages((prevMessages) => [...prevMessages, data.message]);
+              console.log("data",data)
             } else if (data.messages) {
               setMessages(data.messages);
             }

@@ -32,6 +32,7 @@ const ChatRoomWrapper = () => {
             headers: { Authorization: `Bearer ${token}` },
           },
         );
+        console.log('response.data', response);
         setMessages(response.data.messages); // Assuming response.data.messages is an array
       } catch (fetchError) {
         console.error('Error fetching initial messages:', fetchError);
@@ -57,7 +58,7 @@ const ChatRoomWrapper = () => {
             const data = JSON.parse(event.data);
             if (data.message) {
               setMessages((prevMessages) => [...prevMessages, data.message]);
-              console.log("data",data)
+              console.log('response.data', data);
             } else if (data.messages) {
               setMessages(data.messages);
             }

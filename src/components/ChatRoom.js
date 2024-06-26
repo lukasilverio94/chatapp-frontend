@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import './ChatRoom.css'; // Import the CSS file
 
-const ChatRoom = ({ roomId, messages, onSendMessage }) => {
+const ChatRoom = ({ roomId, roomName, messages, onSendMessage }) => {
   const [messageInput, setMessageInput] = useState('');
   const [error, setError] = useState(null);
 
@@ -23,24 +24,52 @@ const ChatRoom = ({ roomId, messages, onSendMessage }) => {
   };
 
   return (
-    <div>
-      <h2>Messages for Room {roomId}</h2>
-      <ul>
+    <div className="chat-room">
+      <h2>Chat Room: {roomName}</h2>
+      <div className="messages">
         {messages.map((msg, index) => (
-          <li key={index}>
-            {/* Display each message */}
-            <strong>{index}</strong>: {msg}
-          </li>
+          <div
+            key={index}
+            className={`message ${index % 2 === 0 ? 'even' : 'odd'}`}
+          >
+            <p>
+              <strong>{msg.sender_first_name}</strong>: {msg.message}
+            </p>
+            <p>
+              <strong>Sender ID:</strong> {msg.sender_id}
+            </p>
+            <p>
+              <strong>Message:</strong> {msg.message}
+            </p>
+            <p>
+              <strong>Timestamp:</strong>{' '}
+              {new Date(msg.timestamp).toLocaleString()}
+            </p>
+            <p>
+              <strong>Is Read:</strong> {msg.is_read ? 'Yes' : 'No'}
+            </p>
+            <p>
+              <strong>Delivery Status:</strong> {msg.delivery_status}
+            </p>
+            {msg.read_receipt && (
+              <p>
+                <strong>Read Receipt:</strong> {msg.read_receipt}
+              </p>
+            )}
+          </div>
         ))}
-      </ul>
-      <form onSubmit={handleSendMessage}>
+      </div>
+      <form onSubmit={handleSendMessage} className="message-form">
         <input
           type="text"
           value={messageInput}
           onChange={handleInputChange}
-          placeholder="Type your message..."
+          placeholder="Type a message..."
+          className="message-input"
         />
-        <button type="submit">Send</button>
+        <button type="submit" className="send-button">
+          Send
+        </button>
       </form>
       {error && <div className="error">{error}</div>}
     </div>

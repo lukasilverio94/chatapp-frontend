@@ -31,7 +31,7 @@ const ChatRoomListCreateComponent = () => {
       <ul>
         {chatRooms.map((room) => (
           <li key={room.id}>
-            <p>{room.id}</p>
+            <p>{room.name}</p>
             <Link
               to={`/chatroom/${room.id}?name=${encodeURIComponent(room.name)}`}
             >

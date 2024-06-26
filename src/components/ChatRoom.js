@@ -11,8 +11,7 @@ const ChatRoom = ({ roomId, roomName, messages, onSendMessage }) => {
       setError('Message cannot be empty');
       return;
     }
-
-    // Call parent component's sendMessage function
+        // Call parent component's sendMessage function
     onSendMessage(messageInput);
 
     // Clear message input after sending

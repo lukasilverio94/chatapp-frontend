@@ -32,7 +32,6 @@ const ChatRoomWrapper = () => {
             headers: { Authorization: `Bearer ${token}` },
           },
         );
-        console.log('response.data', response);
         setMessages(response.data.messages); // Assuming response.data.messages is an array
       } catch (fetchError) {
         console.error('Error fetching initial messages:', fetchError);
@@ -58,7 +57,6 @@ const ChatRoomWrapper = () => {
             const data = JSON.parse(event.data);
             if (data.message) {
               setMessages((prevMessages) => [...prevMessages, data.message]);
-              console.log('response.data', data);
             } else if (data.messages) {
               setMessages(data.messages);
             }
@@ -103,18 +101,7 @@ const ChatRoomWrapper = () => {
 
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
       try {
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-          console.error('JWT Token is missing');
-          setError('JWT Token is missing');
-          return;
-        }
-
-        const messagePayload = {
-          message,
-          token,
-        };
-
+        const messagePayload = { message };
         socketRef.current.send(JSON.stringify(messagePayload));
         setError(null); // Clear any previous errors on successful send
       } catch (error) {
@@ -129,9 +116,6 @@ const ChatRoomWrapper = () => {
 
   return (
     <div>
-      {messages.length === 0 && !error && (
-        <p>No messages available. Please check your connection.</p>
-      )}
       <ChatRoom
         roomId={roomId}
         messages={messages}

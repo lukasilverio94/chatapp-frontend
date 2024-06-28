@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { selectCurrentUserId } from "../store/authStore"; // Import updateCurrentUserId here
 
 const UserList = ({ onSelect }) => {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
 
-  const token = useSelector((state) => state.auth.user.token);
   const currentUserId = useSelector(selectCurrentUserId);
 
   useEffect(() => {
@@ -30,6 +29,8 @@ const UserList = ({ onSelect }) => {
     console.log(
       `Current user ID: ${currentUserId}, Selected user ID: ${selectedUserId}`
     );
+    const chatRoomId = currentUserId ^ selectedUserId;
+    console.log(chatRoomId);
   };
 
   return (

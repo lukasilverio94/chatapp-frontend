@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import UserList from './UserList';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
@@ -27,6 +28,7 @@ const ChatRoomListCreateComponent = () => {
 
   return (
     <div>
+      <UserList />
       <h2>Chat Rooms</h2>
       <ul>
         {chatRooms.map((room) => (

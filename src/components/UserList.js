@@ -1,22 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useSelector } from "react-redux";
-import { selectCurrentUserId } from "../store/authStore"; // Adjust the import path as necessary
+import { useSelector, useDispatch } from "react-redux";
+import { selectCurrentUserId } from "../store/authStore"; // Import updateCurrentUserId here
 
 const UserList = ({ onSelect }) => {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
 
   const token = useSelector((state) => state.auth.user.token);
-  const currentUser = useSelector((state) => {
-    if (!state.auth.user) return null;
-    const tokenPayload = JSON.parse(atob(state.auth.user.token.split(".")[1]));
-    return tokenPayload.user_id;
-  });
-
-  console.log("Current user: ", currentUser);
-
-  // Use selectCurrentUserId to correctly retrieve the current user's ID
   const currentUserId = useSelector(selectCurrentUserId);
 
   useEffect(() => {
@@ -49,7 +40,7 @@ const UserList = ({ onSelect }) => {
         {users.map((user) => (
           <div key={user.id}>
             <li>
-              {user.first_name} {user.last_name}
+              {user.first_name} {user.last_name} {user.id}
             </li>
             <button onClick={() => handleGenerateChatRoom(user.id)}>
               Chat

@@ -1,11 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { jwtDecode } from "jwt-decode"; // Import jwt-decode library
+import { jwtDecode } from "jwt-decode";
 
 const initialState = {
   isLoggedIn: false,
   loading: false,
   user: null,
-  token: null, // Corrected from access_token to token to match the state structure in the login reducer
+  token: null,
   currentUserId: null,
 };
 
@@ -16,13 +16,15 @@ const authSlice = createSlice({
     login(state, action) {
       state.isLoggedIn = true;
       state.user = action.payload.user;
-      state.token = action.payload.token; // Corrected from access_token to token to match the payload structure
-      state.currentUserId = action.payload.user.id;
+      state.token = action.payload.token;
+      // Ensure the user ID is correctly extracted from the decoded token
+      const decoded = jwtDecode(action.payload.token);
+      state.currentUserId = decoded.user_id;
     },
     logout(state) {
       state.isLoggedIn = false;
       state.user = null;
-      state.token = null; // Clear the token on logout
+      state.token = null;
       state.currentUserId = null;
     },
     setLoading(state, action) {
@@ -31,16 +33,14 @@ const authSlice = createSlice({
   },
 });
 
-// Action creators are generated for each case reducer function
 export const { login, logout, setLoading } = authSlice.actions;
 
-// Selector to get the token
 export const selectToken = (state) => state.auth.token;
 
 export const selectUserId = (state) => {
   if (state.auth.token) {
     const decoded = jwtDecode(state.auth.token);
-    return decoded.user_id; // Assuming the payload has a user_id field
+    return decoded.user_id;
   }
   return null;
 };

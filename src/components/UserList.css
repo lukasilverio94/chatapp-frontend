@@ -1,0 +1,13 @@
+.user-list {
+  padding: 20px;
+}
+
+.user-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.error {
+  color: red;
+}

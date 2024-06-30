@@ -1,9 +1,27 @@
-import React, { useState } from 'react';
-import './ChatRoom.css'; // Import the CSS file
+import React, { useState, useEffect } from 'react';
+import './ChatRoom.css';
+import WebSocketService from './WebSocketService'; // Import WebSocketService
 
-const ChatRoom = ({ roomId, roomName, messages, onSendMessage }) => {
+const ChatRoom = ({ roomId, roomType }) => {
+  const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState('');
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Connect to WebSocket on component mount
+    WebSocketService.connect(roomId, roomType, onMessageReceived);
+
+    // Clean up WebSocket connection on component unmount
+    return () => {
+      WebSocketService.close();
+    };
+  }, [roomId, roomType]);
+
+  const onMessageReceived = (message) => {
+    
+
+    setMessages((prevMessages) => [...prevMessages, message]);
+  };
 
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -11,11 +29,10 @@ const ChatRoom = ({ roomId, roomName, messages, onSendMessage }) => {
       setError('Message cannot be empty');
       return;
     }
-        // Call parent component's sendMessage function
-    onSendMessage(messageInput);
 
-    // Clear message input after sending
+    WebSocketService.sendMessage({ message: messageInput });
     setMessageInput('');
+    setError(null);
   };
 
   const handleInputChange = (e) => {
@@ -24,7 +41,7 @@ const ChatRoom = ({ roomId, roomName, messages, onSendMessage }) => {
 
   return (
     <div className="chat-room">
-      <h2>Chat Room: {roomName}</h2>
+      <h2>Chat Room: {roomId}</h2>
       <div className="messages">
         {messages.map((msg, index) => (
           <div
@@ -32,13 +49,10 @@ const ChatRoom = ({ roomId, roomName, messages, onSendMessage }) => {
             className={`message ${index % 2 === 0 ? 'even' : 'odd'}`}
           >
             <p>
-              <strong>{msg.sender_first_name}</strong>: {msg.message}
+              <strong>{msg.sender_first_name}</strong>: {msg.content}
             </p>
             <p>
               <strong>Sender ID:</strong> {msg.sender_id}
-            </p>
-            <p>
-              <strong>Message:</strong> {msg.message}
             </p>
             <p>
               <strong>Timestamp:</strong>{' '}
@@ -58,6 +72,7 @@ const ChatRoom = ({ roomId, roomName, messages, onSendMessage }) => {
           </div>
         ))}
       </div>
+
       <form onSubmit={handleSendMessage} className="message-form">
         <input
           type="text"

@@ -1,53 +1,49 @@
 .chat-room {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .messages {
-  background-color: #f7f7f7;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  max-height: 400px;
+  flex: 1;
   overflow-y: auto;
-  margin-bottom: 10px;
+  padding: 10px;
 }
 
 .message {
-  padding: 10px;
   margin-bottom: 10px;
-  border-radius: 4px;
+  padding: 10px;
+  border-radius: 5px;
 }
 
 .message.even {
-  background-color: #e1f5fe;
+  background-color: #f1f1f1;
 }
 
 .message.odd {
-  background-color: #fff3e0;
+  background-color: #e0e0e0;
 }
 
 .message-form {
   display: flex;
-  align-items: center;
+  padding: 10px;
+  background-color: #fff;
 }
 
 .message-input {
   flex: 1;
   padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 .send-button {
   padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
+  margin-left: 10px;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
   cursor: pointer;
 }
 

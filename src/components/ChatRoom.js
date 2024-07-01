@@ -12,8 +12,18 @@ const ChatRoom = ({ roomId, roomType }) => {
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
+    // Function to clear messages
+    const clearMessages = () => {
+      setMessages([]);
+    };
+
     // Connect to WebSocket on component mount
-    WebSocketService.connect(roomId, roomType, onMessageReceived);
+    WebSocketService.connect(
+      roomId,
+      roomType,
+      onMessageReceived,
+      clearMessages,
+    );
 
     // Clean up WebSocket connection on component unmount
     return () => {

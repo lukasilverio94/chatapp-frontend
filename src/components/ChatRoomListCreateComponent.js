@@ -28,7 +28,6 @@ const ChatRoomListCreateComponent = ({ onRoomSelect }) => {
 
   const handleRoomSelect = (roomId) => {
     onRoomSelect(roomId, 'chatroom');
-    console.log('Selected room ID:', roomId);
   };
 
   return (

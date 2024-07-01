@@ -2,7 +2,7 @@ const WebSocketService = {
   socket: null,
   token: null,
   reconnectAttempts: 0,
-  maxReconnectAttempts: 5,
+  maxReconnectAttempts: 0,
   reconnectInterval: 2000, // 2 seconds
 
   connect(roomId, roomType, onMessageReceived) {
@@ -13,7 +13,7 @@ const WebSocketService = {
     }
 
     const socketUrl = `ws://localhost:8000/ws/chat/${roomType}/${roomId}/?token=${this.token}`;
-    console.log('Trying to connect to WebSocket:', socketUrl);
+   
 
     try {
       this.socket = new WebSocket(socketUrl);
@@ -25,7 +25,6 @@ const WebSocketService = {
 
       this.socket.onmessage = (event) => {
         const message = JSON.parse(event.data);
-        console.log('Received message:', message);
         onMessageReceived(message);
       };
 

@@ -69,17 +69,19 @@ const ChatRoom = ({ roomId, roomType }) => {
   };
 
   return (
-    <div className="chat-room">
+    <div className="chat-room container">
       <h2>Chat Room: {roomId}</h2>
 
       {/* Notification Section */}
-      {notification && <div className="notification">{notification}</div>}
+      {notification && <div className="alert alert-info">{notification}</div>}
 
-      <div className="messages">
+      <div className="messages border rounded overflow-auto">
         {messages.map((msg, index) => (
           <div
             key={index}
-            className={`message ${index % 2 === 0 ? 'even' : 'odd'}`}
+            className={`message ${
+              index % 2 === 0 ? 'even' : 'odd'
+            } border p-3 mb-3 rounded`}
           >
             <p>
               <strong>{msg.sender_first_name}</strong>: {msg.content}
@@ -107,19 +109,24 @@ const ChatRoom = ({ roomId, roomType }) => {
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSendMessage} className="message-form">
-        <input
-          type="text"
-          value={messageInput}
-          onChange={handleInputChange}
-          placeholder="Type a message..."
-          className="message-input"
-        />
-        <button type="submit" className="send-button">
-          Send
-        </button>
+      <form
+        onSubmit={handleSendMessage}
+        className="message-form border-top border-top mt-3 pt-3"
+      >
+        <div className="input-group">
+          <input
+            type="text"
+            value={messageInput}
+            onChange={handleInputChange}
+            placeholder="Type a message..."
+            className="form-control message-input"
+          />
+          <button type="submit" className="btn btn-primary send-button">
+            Send
+          </button>
+        </div>
+        {error && <div className="error mt-2">{error}</div>}
       </form>
-      {error && <div className="error">{error}</div>}
     </div>
   );
 };

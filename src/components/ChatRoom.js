@@ -7,6 +7,7 @@ const ChatRoom = ({ roomId, roomType }) => {
   const [messageInput, setMessageInput] = useState('');
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState('');
+  const [roomName, setRoomName] = useState('');
 
   // Ref for messages container to scroll to bottom
   const messagesEndRef = useRef(null);
@@ -22,6 +23,7 @@ const ChatRoom = ({ roomId, roomType }) => {
       roomId,
       roomType,
       onMessageReceived,
+      onRoomNameReceived,
       clearMessages,
     );
 
@@ -48,6 +50,10 @@ const ChatRoom = ({ roomId, roomType }) => {
     );
   };
 
+  const onRoomNameReceived = (name) => {
+    setRoomName(name);
+  };
+
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!messageInput.trim()) {
@@ -70,17 +76,14 @@ const ChatRoom = ({ roomId, roomType }) => {
 
   return (
     <div className="chat-room container">
-      <h2>Chat Room: {roomId}</h2>
-
-      {/* Notification Section */}
-      {notification && <div className="alert alert-info">{notification}</div>}
+      <h2>{roomType === 'chatroom' ? 'Chat Room' : 'Direct Message'}: {roomName}</h2>
 
       <div className="messages border rounded overflow-auto">
         {messages.map((msg, index) => (
           <div
             key={index}
             className={`message ${
-              msg.receiver_id === roomId ? 'receiver' : ''
+              msg.receiver_id === roomId ? 'receiver' : 'others'
             }  border p-3 mb-3 rounded`}
           >
             <p>
@@ -89,9 +92,11 @@ const ChatRoom = ({ roomId, roomType }) => {
             <p>
               <strong>Sender ID:</strong> {msg.sender_id}
             </p>
-            <p>
-              <strong>roomId:</strong> {roomId}
-            </p>
+            {roomType === 'chatroom' && (
+              <p>
+                <strong>roomId:</strong> {roomId}
+              </p>
+            )}
             <p>
               <strong>receiver_id:</strong> {msg.receiver_id}
             </p>

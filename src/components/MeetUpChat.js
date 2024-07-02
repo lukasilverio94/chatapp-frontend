@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import ChatRoomListCreateComponent from './ChatRoomListCreateComponent';
 import UserList from './UserList';
 import ChatRoom from './ChatRoom';
@@ -6,8 +6,16 @@ import './MeetUpChat.css';
 import { AuthContext } from '../App';
 
 const MeetUpChat = () => {
-  const { isLoggedIn } = useContext(AuthContext);
+  const { isLoggedIn, user } = useContext(AuthContext); // Assuming AuthContext provides user information
   const [selectedRoom, setSelectedRoom] = useState({ id: null, type: null });
+  const [userId, setUserId] = useState(null); // State to store user ID
+
+  useEffect(() => {
+    if (user) {
+      setUserId(user.id); // Assuming user object has id property
+    }
+    console.log(user);
+  }, [user]);
 
   const handleRoomSelect = (roomId, type) => {
     setSelectedRoom({ id: roomId, type: type });
@@ -21,7 +29,6 @@ const MeetUpChat = () => {
   return (
     <div className="home-page">
       <div className="sidebar-left">
-        
         <ChatRoomListCreateComponent onRoomSelect={handleRoomSelect} />
       </div>
       <div className="main-content">

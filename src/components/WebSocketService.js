@@ -5,7 +5,7 @@ const WebSocketService = {
   maxReconnectAttempts: 0,
   reconnectInterval: 2000, // 2 seconds
 
-  connect(roomId, roomType, onMessageReceived) {
+  connect(roomId, roomType, onMessageReceived, onRoomNameReceived) {
     this.token = localStorage.getItem('access_token');
     if (!this.token) {
       console.error('JWT Token is missing');
@@ -13,7 +13,6 @@ const WebSocketService = {
     }
 
     const socketUrl = `ws://localhost:8000/ws/chat/${roomType}/${roomId}/?token=${this.token}`;
-   
 
     try {
       this.socket = new WebSocket(socketUrl);
@@ -24,10 +23,14 @@ const WebSocketService = {
       };
 
       this.socket.onmessage = (event) => {
-        
         const message = JSON.parse(event.data);
-        console.log("event.data",event.data)
-        onMessageReceived(message);
+        console.log("event.data", event.data);
+        if (message.room_name) {
+          onRoomNameReceived(message.room_name);
+          console.log('message.room_name',message.room_name);
+        } else {
+          onMessageReceived(message);
+        }
       };
 
       this.socket.onclose = (event) => {
@@ -39,7 +42,7 @@ const WebSocketService = {
           setTimeout(() => {
             this.reconnectAttempts++;
             console.log(`Reconnecting... Attempt ${this.reconnectAttempts}`);
-            this.connect(roomId, roomType, onMessageReceived);
+            this.connect(roomId, roomType, onMessageReceived, onRoomNameReceived);
           }, this.reconnectInterval);
         }
       };

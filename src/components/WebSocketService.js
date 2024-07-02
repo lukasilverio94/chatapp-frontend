@@ -6,9 +6,9 @@ const WebSocketService = {
   reconnectInterval: 2000, // 2 seconds
 
   connect(roomId, roomType, onMessageReceived, onRoomNameReceived) {
-    this.token = localStorage.getItem('access_token');
+    this.token = localStorage.getItem("access_token");
     if (!this.token) {
-      console.error('JWT Token is missing');
+      console.error("JWT Token is missing");
       return;
     }
 
@@ -18,7 +18,7 @@ const WebSocketService = {
       this.socket = new WebSocket(socketUrl);
 
       this.socket.onopen = () => {
-        console.log('WebSocket connection opened');
+        console.log("WebSocket connection opened");
         this.reconnectAttempts = 0; // Reset reconnect attempts on successful connection
       };
 
@@ -27,14 +27,14 @@ const WebSocketService = {
         console.log("event.data", event.data);
         if (message.room_name) {
           onRoomNameReceived(message.room_name);
-          console.log('message.room_name',message.room_name);
+          console.log("message.room_name", message.room_name);
         } else {
           onMessageReceived(message);
         }
       };
 
       this.socket.onclose = (event) => {
-        console.log('WebSocket connection closed', event);
+        console.log("WebSocket connection closed", event);
         if (
           !event.wasClean &&
           this.reconnectAttempts < this.maxReconnectAttempts
@@ -42,17 +42,22 @@ const WebSocketService = {
           setTimeout(() => {
             this.reconnectAttempts++;
             console.log(`Reconnecting... Attempt ${this.reconnectAttempts}`);
-            this.connect(roomId, roomType, onMessageReceived, onRoomNameReceived);
+            this.connect(
+              roomId,
+              roomType,
+              onMessageReceived,
+              onRoomNameReceived
+            );
           }, this.reconnectInterval);
         }
       };
 
       this.socket.onerror = (error) => {
-        console.error('WebSocket error:', error);
+        console.error("WebSocket error:", error);
         // Handle WebSocket errors
       };
     } catch (error) {
-      console.error('WebSocket connection error:', error);
+      console.error("WebSocket connection error:", error);
       // Handle WebSocket connection error
     }
   },
@@ -61,7 +66,7 @@ const WebSocketService = {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify(message));
     } else {
-      console.error('WebSocket is not open. Unable to send message:', message);
+      console.error("WebSocket is not open. Unable to send message:", message);
       // Optionally, queue the message for later sending
     }
   },

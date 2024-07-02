@@ -1,29 +1,21 @@
-import React, { useState, useContext, useEffect } from 'react';
-import ChatRoomListCreateComponent from './ChatRoomListCreateComponent';
-import UserList from './UserList';
-import ChatRoom from './ChatRoom';
-import './MeetUpChat.css';
-import { AuthContext } from '../App';
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import ChatRoomListCreateComponent from "./ChatRoomListCreateComponent";
+import UserList from "./UserList";
+import ChatRoom from "./ChatRoom";
+import "./MeetUpChat.css";
 
 const MeetUpChat = () => {
-  const { isLoggedIn, user } = useContext(AuthContext); // Assuming AuthContext provides user information
+  // Use useSelector to access the isLoggedIn state from Redux store
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const [selectedRoom, setSelectedRoom] = useState({ id: null, type: null });
-  const [userId, setUserId] = useState(null); // State to store user ID
-
-  useEffect(() => {
-    if (user) {
-      setUserId(user.id); // Assuming user object has id property
-    }
-    console.log(user);
-  }, [user]);
 
   const handleRoomSelect = (roomId, type) => {
     setSelectedRoom({ id: roomId, type: type });
   };
 
   const handleDirectMessageSelect = (receiver_id, type) => {
-    // Assuming receiver_id should be used to start a direct message chat
-    setSelectedRoom({ id: receiver_id, type: 'direct' });
+    setSelectedRoom({ id: receiver_id, type: "direct" });
   };
 
   return (

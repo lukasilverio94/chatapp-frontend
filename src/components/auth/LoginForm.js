@@ -57,7 +57,7 @@ const LoginPage = () => {
             refresh_token,
           })
         );
-        console.table("Login successful: ", response.data);
+        localStorage.setItem("access_token", access_token);
         // Consider using secure storage for access_token
         toast.success("Login successful");
         navigate("/");

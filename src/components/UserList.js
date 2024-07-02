@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import './UserList.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "./UserList.css";
 
 const UserList = ({ onDirectMessageSelect }) => {
   const [users, setUsers] = useState([]);
@@ -12,12 +12,12 @@ const UserList = ({ onDirectMessageSelect }) => {
       setLoading(true);
       try {
         const response = await axios.get(
-          'http://localhost:8000/api/auth/users',
+          "http://localhost:8000/api/auth/users"
         );
         setUsers(response.data);
       } catch (error) {
-        console.error('Error fetching users:', error);
-        setError('Error fetching users. Please try again.');
+        console.error("Error fetching users:", error);
+        setError("Error fetching users. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -27,8 +27,8 @@ const UserList = ({ onDirectMessageSelect }) => {
   }, []);
 
   const handleDirectMessageSelect = (receiver_id) => {
-    onDirectMessageSelect(receiver_id, 'direct');
-    console.log('Selected receiver_id:', receiver_id);
+    onDirectMessageSelect(receiver_id, "direct");
+    console.log("Selected receiver_id:", receiver_id);
   };
 
   return (
@@ -39,7 +39,7 @@ const UserList = ({ onDirectMessageSelect }) => {
       <ul>
         {users.map((user) => (
           <li key={user.id} className="user-item">
-            {user.first_name} 
+            {user.first_name}
             <button
               className="btn btn-primary btn-sml send-button"
               onClick={() => handleDirectMessageSelect(user.id)}

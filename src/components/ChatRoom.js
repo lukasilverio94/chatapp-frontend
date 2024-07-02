@@ -80,14 +80,20 @@ const ChatRoom = ({ roomId, roomType }) => {
           <div
             key={index}
             className={`message ${
-              index % 2 === 0 ? 'even' : 'odd'
-            } border p-3 mb-3 rounded`}
+              msg.receiver_id === roomId ? 'receiver' : ''
+            }  border p-3 mb-3 rounded`}
           >
             <p>
               <strong>{msg.sender_first_name}</strong>: {msg.content}
             </p>
             <p>
               <strong>Sender ID:</strong> {msg.sender_id}
+            </p>
+            <p>
+              <strong>roomId:</strong> {roomId}
+            </p>
+            <p>
+              <strong>receiver_id:</strong> {msg.receiver_id}
             </p>
             <p>
               <strong>Timestamp:</strong>{' '}
@@ -106,6 +112,7 @@ const ChatRoom = ({ roomId, roomType }) => {
             )}
           </div>
         ))}
+
         <div ref={messagesEndRef} />
       </div>
 

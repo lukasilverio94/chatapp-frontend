@@ -1,7 +1,7 @@
-// In UserList.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './UserList.css';
+
 const UserList = ({ onDirectMessageSelect }) => {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
@@ -31,24 +31,6 @@ const UserList = ({ onDirectMessageSelect }) => {
     console.log('Selected receiver_id:', receiver_id);
   };
 
-  const handleDirectMessage = async (receiver_id) => {
-    try {
-      const response = await axios.post(
-        'http://localhost:8000/api/chat/',
-        { receiver_id },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-          },
-        },
-      );
-      console.log('Direct message initiated:', response.data);
-    } catch (error) {
-      console.error('Error initiating direct message:', error);
-      setError('Error initiating direct message. Please try again.');
-    }
-  };
-
   return (
     <div className="user-list">
       <h2>User List</h2>
@@ -57,8 +39,11 @@ const UserList = ({ onDirectMessageSelect }) => {
       <ul>
         {users.map((user) => (
           <li key={user.id} className="user-item">
-            {user.first_name} {user.last_name} (ID: {user.id})
-            <button onClick={() => handleDirectMessageSelect(user.id)}>
+            {user.first_name} 
+            <button
+              className="btn btn-primary btn-sml send-button"
+              onClick={() => handleDirectMessageSelect(user.id)}
+            >
               Chat
             </button>
           </li>

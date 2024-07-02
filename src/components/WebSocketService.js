@@ -24,7 +24,9 @@ const WebSocketService = {
       };
 
       this.socket.onmessage = (event) => {
+        
         const message = JSON.parse(event.data);
+        console.log("event.data",event.data)
         onMessageReceived(message);
       };
 

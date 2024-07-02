@@ -1,57 +1,99 @@
-.chat-room {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+/* Container for the entire chat room */
+.chat-room.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px;
+/* Header for the chat room */
+.chat-room h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
 }
 
-.message {
-  margin-bottom: 10px;
+/* Notification section */
+.alert-info {
+  background-color: #e9f7fd;
+  color: #31708f;
+  border-color: #bce8f1;
+  text-align: center;
+  margin-bottom: 20px;
   padding: 10px;
   border-radius: 5px;
 }
 
-.message.even {
+/* Container for messages */
+.messages {
+  height: 400px;
+  padding: 15px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  overflow-y: auto;
+}
+
+/* Individual message styling */
+.message {
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 5px;
   background-color: #f1f1f1;
+  transition: background-color 0.3s;
 }
 
-.message.odd {
-  background-color: #e0e0e0;
+
+
+.message.others {
+  background-color: #f9f9f9;
+  text-align: left;
 }
 
+/* Message styling for received messages */
+.message.receiver {
+  background-color: #d1ecf1;
+  text-align: right;
+}
+
+/* Strong tags in messages */
+.message strong {
+  color: #333;
+}
+
+/* Form for sending messages */
 .message-form {
   display: flex;
-  padding: 10px;
-  background-color: #fff;
+  flex-direction: column;
 }
 
+/* Input group styling */
+.input-group {
+  display: flex;
+}
+
+/* Message input field styling */
 .message-input {
   flex: 1;
+  border-radius: 5px 0 0 5px;
   padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  border: 1px solid #ddd;
 }
 
+/* Send button styling */
 .send-button {
+  border-radius: 0 5px 5px 0;
   padding: 10px 20px;
-  margin-left: 10px;
-  border: none;
-  border-radius: 5px;
-  background-color: #007bff;
-  color: #fff;
-  cursor: pointer;
+  border: 1px solid #007bff;
 }
 
-.send-button:hover {
-  background-color: #0056b3;
-}
-
+/* Error message styling */
 .error {
-  color: red;
+  color: #d9534f;
+  font-size: 14px;
   margin-top: 10px;
+  text-align: center;
 }

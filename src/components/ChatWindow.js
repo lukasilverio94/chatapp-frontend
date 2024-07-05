@@ -1,12 +1,11 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import ChatRoomListCreateComponent from "./ChatRoomListCreateComponent";
-import UserList from "./UserList";
-import ChatRoom from "./ChatRoom";
-import "./MeetUpChat.css";
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import MessageSidebar from './MessageSidebar';
+import UserList from './UserList';
+import ChatRoom from './ChatRoom';
+import './MessagesList.css'; // Renamed CSS file to MessagesList.css
 
-const MeetUpChat = () => {
-  // Use useSelector to access the isLoggedIn state from Redux store
+const MessagesList = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const [selectedRoom, setSelectedRoom] = useState({ id: null, type: null });
 
@@ -15,13 +14,13 @@ const MeetUpChat = () => {
   };
 
   const handleDirectMessageSelect = (receiver_id, type) => {
-    setSelectedRoom({ id: receiver_id, type: "direct" });
+    setSelectedRoom({ id: receiver_id, type: 'direct' });
   };
 
   return (
     <div className="home-page">
       <div className="sidebar-left">
-        <ChatRoomListCreateComponent onRoomSelect={handleRoomSelect} />
+        <MessageSidebar onRoomSelect={handleRoomSelect} />
       </div>
       <div className="main-content">
         {selectedRoom.id ? (
@@ -30,11 +29,8 @@ const MeetUpChat = () => {
           <div>Select a chat room to start chatting</div>
         )}
       </div>
-      <div className="sidebar-right">
-        <UserList onDirectMessageSelect={handleDirectMessageSelect} />
-      </div>
     </div>
   );
 };
 
-export default MeetUpChat;
+export default MessagesList;

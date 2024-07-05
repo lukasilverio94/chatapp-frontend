@@ -18,6 +18,21 @@ const ChatRoom = ({ roomId, roomType }) => {
       setMessages([]);
     };
 
+    // Function to fetch messages for the new room
+    const fetchMessages = async (newRoomId) => {
+      try {
+        const fetchedMessages = await WebSocketService.fetchMessages(newRoomId);
+        setMessages(fetchedMessages);
+        scrollToBottom();
+      } catch (error) {
+        setError('Failed to fetch messages');
+      }
+    };
+
+    // Clear messages and fetch new ones on roomId change
+    clearMessages();
+    fetchMessages(roomId);
+
     // Connect to WebSocket on component mount
     WebSocketService.connect(
       roomId,
@@ -33,21 +48,22 @@ const ChatRoom = ({ roomId, roomType }) => {
     };
   }, [roomId, roomType]);
 
-  useEffect(() => {
-    // Scroll to bottom of messages container when messages state updates
-    scrollToBottom();
-  }, [messages]);
+  const onMessageReceived = (data) => {
+    console.log('New message received', data);
 
-  const onMessageReceived = (message) => {
-    console.log('New message received', message);
+    // Extract the actual message object from the nested structure
+    const message = data.message;
 
     // Update messages state with the new message
-    setMessages((prevMessages) => [...prevMessages, message.message]);
+    setMessages((prevMessages) => [...prevMessages, message]);
 
     // Display notification for the new message
     setNotification(
       `New message from ${message.sender_first_name}: ${message.content}`,
     );
+
+    // Scroll to bottom when a new message is received
+    scrollToBottom();
   };
 
   const onRoomNameReceived = (name) => {
@@ -76,7 +92,9 @@ const ChatRoom = ({ roomId, roomType }) => {
 
   return (
     <div className="chat-room container">
-      <h2>{roomType === 'chatroom' ? 'Chat Room' : 'Direct Message'}: {roomName}</h2>
+      <h2>
+        {roomType === 'chatroom' ? 'Chat Room' : 'Direct Message'}: {roomName}
+      </h2>
 
       <div className="messages border rounded overflow-auto">
         {messages.map((msg, index) => (
@@ -105,7 +123,7 @@ const ChatRoom = ({ roomId, roomType }) => {
               {new Date(msg.timestamp).toLocaleString()}
             </p>
             <p>
-              <strong>Is Read:</strong> {msg.is_read ? 'Yes' : 'No'}
+              <strong>Is Read:</strong> {msg.un_read ? 'No' : 'Yes'}
             </p>
             <p>
               <strong>Delivery Status:</strong> {msg.delivery_status}

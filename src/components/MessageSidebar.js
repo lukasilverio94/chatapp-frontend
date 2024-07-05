@@ -76,7 +76,7 @@ const MessageSidebar = ({ initialRoomId, initialRoomType, onRoomSelect }) => {
         config,
       );
       setConversations(response.data);
-      console.log("setConversations",response.data)
+      console.log('setConversations', response.data);
     } catch (error) {
       console.error('Error fetching conversations:', error);
       setError('Error fetching conversations. Please try again.');
@@ -240,7 +240,8 @@ const MessageSidebar = ({ initialRoomId, initialRoomType, onRoomSelect }) => {
                 />
                 {conversation.first_name}{' '}
                 <span className="subtext">
-                  {conversation.lastMessage.content}
+                  {conversation.last_message.content}{' '}
+                  {/* Use last_message instead of lastMessage */}
                 </span>
                 <span className="time-text">
                   {conversation.timestamp &&

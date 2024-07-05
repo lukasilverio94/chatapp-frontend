@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import MessageSidebar from './MessageSidebar';
-import UserList from './UserList';
 import ChatRoom from './ChatRoom';
 import './MessagesList.css'; // Renamed CSS file to MessagesList.css
 

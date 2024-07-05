@@ -26,18 +26,22 @@ const MessageSidebar = ({ initialRoomId, initialRoomType, onRoomSelect }) => {
   const [error, setError] = useState(null);
   const [users, setUsers] = useState([]);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
 
   useEffect(() => {
+    setChatMessages([]); // Clear messages when room changes
+
     WebSocketService.connect(
       selectedRoomId,
       selectedRoomType,
       onMessageReceived,
       onRoomNameReceived,
-      () => setConversations([])
+      () => setConversations([]),
     );
 
     fetchChatRooms();
     fetchConversations();
+
     return () => {
       WebSocketService.close();
     };
@@ -47,7 +51,7 @@ const MessageSidebar = ({ initialRoomId, initialRoomType, onRoomSelect }) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        'http://localhost:8000/chatMeetUp/chatrooms/'
+        'http://localhost:8000/chatMeetUp/chatrooms/',
       );
       setChatRooms(response.data);
       setLoading(false);
@@ -69,9 +73,10 @@ const MessageSidebar = ({ initialRoomId, initialRoomType, onRoomSelect }) => {
 
       const response = await axios.get(
         'http://localhost:8000/chatMeetUp/messages/',
-        config
+        config,
       );
       setConversations(response.data);
+      console.log("setConversations",response.data)
     } catch (error) {
       console.error('Error fetching conversations:', error);
       setError('Error fetching conversations. Please try again.');
@@ -91,46 +96,24 @@ const MessageSidebar = ({ initialRoomId, initialRoomType, onRoomSelect }) => {
       const users = response.data;
       setUsers(users);
       setShowUserDropdown(true);
-      setLoading(false);
     } catch (error) {
       console.error('Error fetching all users:', error);
       setError('Error fetching all users. Please try again.');
+    } finally {
       setLoading(false);
     }
   };
 
   const handleUserSelect = (user) => {
     console.log('Selected user:', user);
-    // Handle user selection logic here, e.g., starting a new conversation
     setShowUserDropdown(false);
+    // Handle logic for starting a new conversation with the selected user
   };
 
   const onMessageReceived = (message) => {
-    setConversations((prevConversations) => {
-      const existingConversationIndex = prevConversations.findIndex(
-        (conv) => conv.id === message.sender_id
-      );
-
-      if (existingConversationIndex !== -1) {
-        const updatedConversations = [...prevConversations];
-        updatedConversations[existingConversationIndex] = {
-          ...updatedConversations[existingConversationIndex],
-          lastMessage: message.content,
-          timestamp: message.timestamp,
-        };
-        return updatedConversations;
-      } else {
-        return [
-          ...prevConversations,
-          {
-            id: message.sender_id,
-            name: message.sender_first_name,
-            lastMessage: message.content,
-            timestamp: message.timestamp,
-          },
-        ];
-      }
-    });
+    if (message.roomId === selectedRoomId) {
+      setChatMessages((prevMessages) => [...prevMessages, message]);
+    }
   };
 
   const onRoomNameReceived = (name) => {
@@ -145,6 +128,7 @@ const MessageSidebar = ({ initialRoomId, initialRoomType, onRoomSelect }) => {
   const handleRoomSelect = (roomId) => {
     setSelectedRoomId(roomId);
     setSelectedRoomType('chatroom');
+    setChatMessages([]); // Clear chat messages when selecting a new room
     onRoomSelect(roomId, 'chatroom');
   };
 
@@ -165,12 +149,6 @@ const MessageSidebar = ({ initialRoomId, initialRoomType, onRoomSelect }) => {
       });
       return sortedConversations;
     });
-  };
-
-  const handleDirectMessageSelect = (receiver_id, type) => {
-    setSelectedRoomId(receiver_id);
-    setSelectedRoomType(type);
-    onRoomSelect(receiver_id, type);
   };
 
   return (
@@ -208,7 +186,7 @@ const MessageSidebar = ({ initialRoomId, initialRoomType, onRoomSelect }) => {
                 {users.map((user) => (
                   <Dropdown.Item
                     key={user.id}
-                    onClick={() => handleClick(user.id)}
+                    onClick={() => handleUserSelect(user)}
                   >
                     {user.first_name}
                   </Dropdown.Item>
@@ -257,11 +235,13 @@ const MessageSidebar = ({ initialRoomId, initialRoomType, onRoomSelect }) => {
               >
                 <img
                   src={index % 2 === 0 ? Profilephoto1 : Profilephoto2}
-                  alt={conversation.name}
+                  alt={conversation.first_name}
                   className="profile-img"
                 />
-                {conversation.name}{' '}
-                <span className="subtext">{conversation.lastMessage}</span>
+                {conversation.first_name}{' '}
+                <span className="subtext">
+                  {conversation.lastMessage.content}
+                </span>
                 <span className="time-text">
                   {conversation.timestamp &&
                     new Date(conversation.timestamp).toLocaleTimeString()}
@@ -292,6 +272,28 @@ const MessageSidebar = ({ initialRoomId, initialRoomType, onRoomSelect }) => {
               </ListGroup.Item>
             ))}
           </ListGroup>
+        )}
+
+        {/* Render chat messages only if there are messages */}
+        {selectedRoomType === 'chatroom' ? (
+          chatMessages.length > 0 ? (
+            <div className="chat-messages">
+              {chatMessages.map((message) => (
+                <div key={message.id}>
+                  <p>{message.content}</p>
+                  <small>
+                    {new Date(message.timestamp).toLocaleTimeString()}
+                  </small>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-chatroom">
+              Select a chat room to start chatting!
+            </div>
+          )
+        ) : (
+          <div>{/* Render direct message UI */}</div>
         )}
       </div>
     </div>

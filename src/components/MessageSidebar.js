@@ -9,11 +9,12 @@ import {
   DropdownButton,
 } from 'react-bootstrap';
 import './ChatRoom.css';
-import WebSocketService from './WebSocketService';
-
+import { v4 as uuidv4 } from 'uuid'; // Import uuidv4 function
 import Message from '../assets/images/message/message.png';
 import Profilephoto1 from '../assets/images/message/profilephoto1.png';
 import Profilephoto2 from '../assets/images/message/profilephoto2.png';
+import { jwtDecode } from 'jwt-decode'; // Importing named export
+
 
 const MessageSidebar = ({ initialRoomId, initialRoomType, onRoomSelect }) => {
   const [conversations, setConversations] = useState([]);
@@ -29,22 +30,8 @@ const MessageSidebar = ({ initialRoomId, initialRoomType, onRoomSelect }) => {
   const [chatMessages, setChatMessages] = useState([]);
 
   useEffect(() => {
-    setChatMessages([]); // Clear messages when room changes
-
-    WebSocketService.connect(
-      selectedRoomId,
-      selectedRoomType,
-      onMessageReceived,
-      onRoomNameReceived,
-      () => setConversations([]),
-    );
-
     fetchChatRooms();
     fetchConversations();
-
-    return () => {
-      WebSocketService.close();
-    };
   }, [selectedRoomId, selectedRoomType]);
 
   const fetchChatRooms = async () => {
@@ -72,11 +59,10 @@ const MessageSidebar = ({ initialRoomId, initialRoomType, onRoomSelect }) => {
       };
 
       const response = await axios.get(
-        'http://localhost:8000/chatMeetUp/messages/',
+        'http://localhost:8000/chatMeetUp/Conversations/',
         config,
       );
       setConversations(response.data);
-      console.log('setConversations', response.data);
     } catch (error) {
       console.error('Error fetching conversations:', error);
       setError('Error fetching conversations. Please try again.');
@@ -105,9 +91,8 @@ const MessageSidebar = ({ initialRoomId, initialRoomType, onRoomSelect }) => {
   };
 
   const handleUserSelect = (user) => {
-    console.log('Selected user:', user);
     setShowUserDropdown(false);
-    // Handle logic for starting a new conversation with the selected user
+    handleClick(user.id); // Pass user ID to handleClick
   };
 
   const onMessageReceived = (message) => {
@@ -120,10 +105,45 @@ const MessageSidebar = ({ initialRoomId, initialRoomType, onRoomSelect }) => {
     // This function might not be needed in the new design
   };
 
-  const handleClick = (conversationId) => {
-    console.log(`Clicked on conversation ${conversationId}`);
-    onRoomSelect(conversationId, 'direct');
-  };
+ /* eslint-disable no-undef */
+const handleClick = (receiverId) => {
+  const accessToken = localStorage.getItem('access_token');
+  if (accessToken) {
+    try {
+      const decodedToken = jwtDecode(accessToken);
+      const user1_id = decodedToken.user_id;
+
+      // Ensure receiverId and user1_id are strings
+      const receiverIdStr = String(receiverId);
+      const user1IdStr = String(user1_id);
+
+      // Convert UUID strings to BigInt for XOR operation
+      const bigintReceiver = BigInt(`0x${receiverIdStr.replace(/-/g, '')}`);
+      const bigintUser1 = BigInt(`0x${user1IdStr.replace(/-/g, '')}`);
+
+      // XOR operation
+      const xorResult = bigintReceiver ^ bigintUser1;
+
+      // Convert the result back to a UUID string format
+      const xorResultHex = xorResult.toString(16);
+      const roomId = `${xorResultHex.substr(0, 8)}-${xorResultHex.substr(8, 4)}-${xorResultHex.substr(12, 4)}-${xorResultHex.substr(16, 4)}-${xorResultHex.substr(20)}`;
+
+      console.log('user1_id', user1_id);
+      console.log('receiverId', receiverId);
+      console.log('receiverIdStr', receiverIdStr);
+      console.log('user1IdStr', user1IdStr);
+      console.log('roomId', roomId);
+
+      onRoomSelect(roomId);
+    } catch (error) {
+      console.error('Error decoding access token:', error);
+    }
+  } else {
+    console.error('Access token not found');
+  }
+};
+/* eslint-enable no-undef */
+
 
   const handleRoomSelect = (roomId) => {
     setSelectedRoomId(roomId);
@@ -241,7 +261,6 @@ const MessageSidebar = ({ initialRoomId, initialRoomType, onRoomSelect }) => {
                 {conversation.first_name}{' '}
                 <span className="subtext">
                   {conversation.last_message.content}{' '}
-                  {/* Use last_message instead of lastMessage */}
                 </span>
                 <span className="time-text">
                   {conversation.timestamp &&
@@ -273,28 +292,6 @@ const MessageSidebar = ({ initialRoomId, initialRoomType, onRoomSelect }) => {
               </ListGroup.Item>
             ))}
           </ListGroup>
-        )}
-
-        {/* Render chat messages only if there are messages */}
-        {selectedRoomType === 'chatroom' ? (
-          chatMessages.length > 0 ? (
-            <div className="chat-messages">
-              {chatMessages.map((message) => (
-                <div key={message.id}>
-                  <p>{message.content}</p>
-                  <small>
-                    {new Date(message.timestamp).toLocaleTimeString()}
-                  </small>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="empty-chatroom">
-              Select a chat room to start chatting!
-            </div>
-          )
-        ) : (
-          <div>{/* Render direct message UI */}</div>
         )}
       </div>
     </div>

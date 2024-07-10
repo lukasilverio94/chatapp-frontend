@@ -116,11 +116,7 @@ const MessagesList = () => {
           4,
         )}-${xorResultHex.substr(20)}`;
 
-        console.log('currentUser_id', currentUser_id);
-        console.log('receiverId', receiverId);
-        console.log('receiverIdStr', receiverIdStr);
-        console.log('currentUserIdStr', currentUserIdStr);
-        console.log('roomId', roomId);
+      
 
         handleSelectChat(roomId);
       } catch (error) {
